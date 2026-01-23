@@ -1,0 +1,133 @@
+:root {
+  --bg-main: #f3f3f3;
+  --bg-bar: #ffffff;
+  --bg-tab: #e6e6e6;
+  --bg-tab-active: #ffffff;
+  --border: #d0d0d0;
+  --text: #222;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-main);
+  overflow: hidden;
+}
+
+/* ===== タイトルバー ===== */
+#titlebar {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  background: var(--bg-bar);
+  border-bottom: 1px solid var(--border);
+}
+
+#tabs {
+  display: flex;
+  flex: 1;
+  padding-left: 8px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  min-width: 140px;
+  max-width: 200px;
+  height: 30px;
+  padding: 6px 10px;
+  margin-right: 6px;
+  background: var(--bg-tab);
+  border-radius: 8px 8px 0 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--bg-tab-active);
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+
+.tab span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  margin-left: auto;
+  font-size: 14px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.tab-close:hover {
+  opacity: 1;
+}
+
+#newTabBtn {
+  margin-right: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+
+/* ===== URLバー ===== */
+#nav {
+  height: 42px;
+  background: var(--bg-bar);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+#urlbar {
+  width: 100%;
+  height: 30px;
+  border-radius: 15px;
+  border: 1px solid var(--border);
+  padding: 0 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+/* ===== 表示領域 ===== */
+#view-container {
+  width: 100vw;
+  height: calc(100vh - 80px);
+  background: #fff;
+}
+
+.webview {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== 右クリックメニュー ===== */
+#context-menu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+
+#context-menu div {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#context-menu div:hover {
+  background: #f0f0f0;
+}
