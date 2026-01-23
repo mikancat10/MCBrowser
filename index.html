@@ -3,120 +3,173 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MCBrowser - Modern Custom Browser</title>
+<title>MCBrowser - Next Generation Browser</title>
 
 <style>
 :root {
-  --bg: #f2f2f2;
-  --card: #ffffff;
-  --gray: #dcdcdc;
-  --text: #111;
-  --accent: #4a6cff;
+  --bg-color: #0d0d0d;
+  --panel-color: #1a1a1a;
+  --accent-color: #3b82f6; /* 鮮やかなブルー */
+  --text-main: #ffffff;
+  --text-sub: #a0a0a0;
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 * {
   box-sizing: border-box;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
+  background-color: var(--bg-color);
+  background-image: radial-gradient(circle at 50% -20%, #222 0%, #0d0d0d 80%);
+  color: var(--text-main);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* ---------- Layout ---------- */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 /* ---------- Header ---------- */
 header {
-  padding: 80px 20px;
+  padding: 120px 20px 80px;
   text-align: center;
 }
 
 header h1 {
-  font-size: 48px;
-  margin-bottom: 10px;
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  background: linear-gradient(to bottom, #fff, #888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
 }
 
 header p {
-  font-size: 18px;
-  color: #555;
+  color: var(--text-sub);
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
 }
 
-/* ---------- Section ---------- */
+/* ---------- Sections ---------- */
 section {
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 0 20px;
+  margin-bottom: 120px;
 }
 
-section h2 {
-  font-size: 32px;
-  margin-bottom: 20px;
-}
-
-/* ---------- Card ---------- */
-.card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.08);
-}
-
-/* ---------- Feature List ---------- */
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.feature {
-  background: #fafafa;
-  border-radius: 14px;
-  padding: 20px;
-  border: 1px solid var(--gray);
-}
-
-.feature h3 {
-  margin-top: 0;
-}
-
-/* ---------- Screenshots ---------- */
-.screenshots {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.screenshots img {
-  width: 100%;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.15);
-}
-
-/* ---------- Download ---------- */
-.download {
+h2 {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent-color);
+  margin-bottom: 32px;
   text-align: center;
 }
 
-.download a {
-  display: inline-block;
-  padding: 16px 36px;
-  background: var(--accent);
-  color: white;
-  border-radius: 999px;
-  font-size: 18px;
-  text-decoration: none;
-  transition: .2s;
+/* ---------- Main Card (About) ---------- */
+.main-card {
+  background: var(--panel-color);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
 }
 
-.download a:hover {
-  transform: scale(1.05);
+.main-card p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: #ddd;
+}
+
+/* ---------- Feature Grid ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.feature-box {
+  background: #151515;
+  border: 1px solid var(--border);
+  padding: 32px;
+  border-radius: 20px;
+  transition: 0.3s ease;
+}
+
+.feature-box:hover {
+  border-color: var(--accent-color);
+  transform: translateY(-5px);
+}
+
+.feature-box h3 {
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+}
+
+.feature-box p {
+  color: var(--text-sub);
+  font-size: 0.95rem;
+}
+
+/* ---------- Single Screenshot ---------- */
+.screenshot-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+}
+
+.screenshot-container img {
+  width: 100%;
+  display: block;
+  filter: brightness(0.9);
+  transition: 0.5s;
+}
+
+.screenshot-container:hover img {
+  filter: brightness(1);
+}
+
+/* ---------- Download Area ---------- */
+.download-area {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 18px 48px;
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 999px;
+  transition: 0.3s;
+  font-size: 1.1rem;
+}
+
+.btn-primary:hover {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
 }
 
 /* ---------- Footer ---------- */
 footer {
+  padding: 60px 0;
+  border-top: 1px solid var(--border);
   text-align: center;
-  padding: 40px;
-  color: #666;
+  color: #444;
+  font-size: 0.9rem;
 }
 </style>
 </head>
@@ -125,61 +178,52 @@ footer {
 
 <header>
   <h1>MCBrowser</h1>
-  <p>軽量・モダン・完全オリジナルUIのデスクトップブラウザ</p>
+  <p>Lightweight & Modern Performance</p>
 </header>
 
-<section>
-  <h2>🧭 MCBrowser とは？</h2>
-  <div class="card">
-    <p>
-      MCBrowser は Electron をベースに開発された、  
-      <strong>モダンデザイン・高速動作・拡張性</strong>を重視した
-      オリジナル Web ブラウザです。
-    </p>
-    <p>
-      白とグレーを基調とした UI、カスタム NewTab、タブ管理、  
-      右クリックメニューなど、使いやすさに徹底的にこだわっています。
-    </p>
-  </div>
-</section>
+<div class="container">
+  <section>
+    <h2>Concept</h2>
+    <div class="main-card">
+      <p>MCBrowser は Electron ベースで構築された、ミニマリズムと機能を両立させた次世代ブラウザです。</p>
+      <p>余計な装飾を削ぎ落とし、<strong>黒を基調とした洗練されたUI</strong>が、あなたのブラウジング体験をより没入感のあるものへと変えます。</p>
+    </div>
+  </section>
 
-<section>
-  <h2>✨ 主な機能</h2>
-  <div class="features">
-    <div class="feature">
-      <h3>🕒 オリジナル NewTab</h3>
-      <p>時計・検索・壁紙を組み合わせた完全独自UI</p>
+  <section>
+    <h2>Features</h2>
+    <div class="features">
+      <div class="feature-box">
+        <h3>Custom NewTab</h3>
+        <p>時計、検索、ミニマルな壁紙。必要なものだけを配置した初期画面。</p>
+      </div>
+      <div class="feature-box">
+        <h3>Smart Tab</h3>
+        <p>直感的なタブ操作と、無駄のないメモリ管理を実現。</p>
+      </div>
+      <div class="feature-box">
+        <h3>Native Menu</h3>
+        <p>独自に拡張された右クリックメニューで、操作をよりスピーディーに。</p>
+      </div>
     </div>
-    <div class="feature">
-      <h3>📑 タブ管理</h3>
-      <p>×ボタンで即クローズ、右クリックメニュー対応</p>
-    </div>
-    <div class="feature">
-      <h3>📋 URLバー操作</h3>
-      <p>コピー / ペースト対応の右クリックメニュー</p>
-    </div>
-    <div class="feature">
-      <h3>⚡ Electron ベース</h3>
-      <p>高速表示・exe化対応</p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section>
-  <h2>🖼 スクリーンショット</h2>
-  <div class="screenshots">
-    <img src="images/screenshot1.png" alt="MCBrowser Screenshot 1">
-  </div>
-</section>
+  <section>
+    <h2>Interface</h2>
+    <div class="screenshot-container">
+      <img src="images/screenshot1.png" alt="MCBrowser UI Preview">
+    </div>
+  </section>
 
-<section class="download">
-  <h2>⬇ ダウンロード</h2>
-  <p>現在開発中 / GitHub にて公開予定</p>
-  <a href="https://github.com/mikancat10/MCBrowser/releases/download/MCBrowser/MCBrowserV1.zip">GitHub Repository</a>
-</section>
+  <section class="download-area">
+    <h2>Get Started</h2>
+    <p style="margin-bottom: 30px; color: var(--text-sub);">現在開発中。GitHubにてソースコードとビルドを公開予定。</p>
+    <a href="https://github.com/mikancat10/MCBrowser" class="btn-primary">GitHub Repository</a>
+  </section>
+</div>
 
 <footer>
-  © 2026 MCBrowser Project
+  &copy; 2026 MCBrowser Project. Developed by mikancat10.
 </footer>
 
 </body>
