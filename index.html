@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MCBrowser - Modern Custom Browser</title>
+
+<style>
+:root {
+  --bg: #f2f2f2;
+  --card: #ffffff;
+  --gray: #dcdcdc;
+  --text: #111;
+  --accent: #4a6cff;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- Header ---------- */
+header {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+header p {
+  font-size: 18px;
+  color: #555;
+}
+
+/* ---------- Section ---------- */
+section {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+section h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+/* ---------- Feature List ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.feature {
+  background: #fafafa;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--gray);
+}
+
+.feature h3 {
+  margin-top: 0;
+}
+
+/* ---------- Screenshots ---------- */
+.screenshots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.screenshots img {
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+/* ---------- Download ---------- */
+.download {
+  text-align: center;
+}
+
+.download a {
+  display: inline-block;
+  padding: 16px 36px;
+  background: var(--accent);
+  color: white;
+  border-radius: 999px;
+  font-size: 18px;
+  text-decoration: none;
+  transition: .2s;
+}
+
+.download a:hover {
+  transform: scale(1.05);
+}
+
+/* ---------- Footer ---------- */
+footer {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>MCBrowser</h1>
+  <p>軽量・モダン・完全オリジナルUIのデスクトップブラウザ</p>
+</header>
+
+<section>
+  <h2>🧭 MCBrowser とは？</h2>
+  <div class="card">
+    <p>
+      MCBrowser は Electron をベースに開発された、  
+      <strong>モダンデザイン・高速動作・拡張性</strong>を重視した
+      オリジナル Web ブラウザです。
+    </p>
+    <p>
+      白とグレーを基調とした UI、カスタム NewTab、タブ管理、  
+      右クリックメニューなど、使いやすさに徹底的にこだわっています。
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>✨ 主な機能</h2>
+  <div class="features">
+    <div class="feature">
+      <h3>🕒 オリジナル NewTab</h3>
+      <p>時計・検索・壁紙を組み合わせた完全独自UI</p>
+    </div>
+    <div class="feature">
+      <h3>📑 タブ管理</h3>
+      <p>×ボタンで即クローズ、右クリックメニュー対応</p>
+    </div>
+    <div class="feature">
+      <h3>📋 URLバー操作</h3>
+      <p>コピー / ペースト対応の右クリックメニュー</p>
+    </div>
+    <div class="feature">
+      <h3>⚡ Electron ベース</h3>
+      <p>高速表示・exe化対応</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>🖼 スクリーンショット</h2>
+  <div class="screenshots">
+    <img src="images/screenshot1.png" alt="MCBrowser Screenshot 1">
+  </div>
+</section>
+
+<section class="download">
+  <h2>⬇ ダウンロード</h2>
+  <p>現在開発中 / GitHub にて公開予定</p>
+  <a href="https://github.com/mikancat10/MCBrowser/releases/download/MCBrowser/MCBrowserV1.zip">GitHub Repository</a>
+</section>
+
+<footer>
+  © 2026 MCBrowser Project
+</footer>
+
+</body>
+</html>
