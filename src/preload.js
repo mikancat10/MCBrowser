@@ -1,5 +1,3 @@
-const path = require("path");
+const { contextBridge } = require("electron");
 
-window.MC = {
-  NEWTAB_URL: `file://${path.join(__dirname, "newtab.html")}`
-};
+contextBridge.exposeInMainWorld("api", {});
