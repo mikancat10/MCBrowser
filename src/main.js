@@ -5,11 +5,16 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(__dirname, "assets/icon.ico"),
+    backgroundColor: "#ffffff",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      webviewTag: true, 
-      contextIsolation: true
+      nodeIntegration: false,
+      contextIsolation: true,
+
+      // 🔥 これが無いと webview は壊れる
+      webviewTag: true,
+
+      // preload は後で拡張できる
+      preload: path.join(__dirname, "preload.js")
     }
   });
 
@@ -17,3 +22,7 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
