@@ -1,0 +1,87 @@
+/* --- Demo専用：高精度シミュレーターUI --- */
+:root {
+    --ui-base: #1e1e1e;
+    --ui-toolbar: #2d2d2d;
+    --ui-active-tab: #3a3a3a;
+    --ui-text: #e0e0e0;
+    --ui-border: rgba(255, 255, 255, 0.1);
+}
+
+body.demo-mode {
+    background: #121212;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ブラウザの外枠（シャドウと面取り） */
+.browser-window {
+    width: 90vw;
+    height: 85vh;
+    background: var(--ui-base);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+    border: 1px solid var(--ui-border);
+    overflow: hidden;
+}
+
+/* タブバーの設計：アクティブなタブが浮き上がる */
+.tab-strip {
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 8px;
+    background: #000;
+    gap: 4px;
+}
+
+.tab {
+    height: 32px;
+    min-width: 160px;
+    background: var(--ui-toolbar);
+    border-radius: 8px 8px 0 0;
+    color: #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab.active {
+    background: var(--ui-base);
+    color: var(--ui-text);
+}
+
+/* ツールバー：アイコンの整列 */
+.toolbar {
+    height: 48px;
+    background: var(--ui-base);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 12px;
+    border-bottom: 1px solid var(--ui-border);
+}
+
+#url-field {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    height: 28px;
+    color: #fff;
+    padding: 0 15px;
+    transition: 0.2s;
+}
+
+#url-field:focus {
+    background: #000;
+    border-color: #0071e3;
+    outline: none;
+}
