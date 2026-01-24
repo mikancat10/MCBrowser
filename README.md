@@ -4,8 +4,8 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
-**MCBrowserPage** は、ミニマリズムと没入感を追求した次世代のウェブブラウザです。
-Electronをベースに構築されており、余計な装飾を削ぎ落とした「黒」が基調のダークUIが、あなたのブラウジングをより洗練されたものにします。
+**MCBrowser** は、ミニマリズムと没入感を追求した次世代のウェブブラウザです。
+Electronをベースに構築されており、余計な装飾を削ぎ落とした「白」が基調のホワイトUIが、あなたのブラウジングをより洗練されたものにします。
 
 [公式サイトはこちら](https://mikancat10.github.io/MCBrowser/)
 
@@ -13,7 +13,7 @@ Electronをベースに構築されており、余計な装飾を削ぎ落とし
 
 ## ✨ 主な特徴 (Features)
 
-- 🌑 **Dark-Centric UI**: 集中力を高めるために設計された、モダンで美しいダークモードデザイン。
+- 🌑 **White-Centric UI**: 集中力を高めるために設計された、モダンで美しいホワイトモードデザイン。
 - 🕒 **Custom NewTab**: 時計と検索窓だけの最小構成。必要なものだけがそこにある体験。
 - ⚡ **Lightweight Performance**: 不要な機能を排除し、Electronのパワーを最大限に活かした軽快な動作。
 - 🖱️ **Enhanced Native Menu**: 操作をスピーディーに行えるよう独自にカスタマイズされた右クリックメニュー。
