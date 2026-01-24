@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
-**MCBrowser** は、ミニマリズムと没入感を追求した次世代のウェブブラウザです。
+**MCBrowserPage** は、ミニマリズムと没入感を追求した次世代のウェブブラウザです。
 Electronをベースに構築されており、余計な装飾を削ぎ落とした「黒」が基調のダークUIが、あなたのブラウジングをより洗練されたものにします。
 
 [公式サイトはこちら](https://mikancat10.github.io/MCBrowser/)
