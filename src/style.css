@@ -33,6 +33,7 @@ body {
   padding-left: 8px;
 }
 
+/* ===== タブ ===== */
 .tab {
   display: flex;
   align-items: center;
@@ -45,12 +46,20 @@ body {
   border-radius: 8px 8px 0 0;
   font-size: 13px;
   cursor: pointer;
+  user-select: none;
+  transition: transform 0.18s cubic-bezier(.2,.8,.2,1),
+              background 0.15s ease;
 }
 
 .tab.active {
   background: var(--bg-tab-active);
   border: 1px solid var(--border);
   border-bottom: none;
+}
+
+.tab.dragging {
+  opacity: 0.9;
+  z-index: 10;
 }
 
 .tab span {
@@ -80,7 +89,7 @@ body {
   cursor: pointer;
 }
 
-/* ===== URLバー ===== */
+/* ===== ナビ ===== */
 #nav {
   height: 42px;
   background: var(--bg-bar);
@@ -90,21 +99,29 @@ body {
   padding: 0 12px;
 }
 
+.nav-btn {
+  width: 30px;
+  height: 30px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 50%;
+  background: #eaeaea;
+  cursor: pointer;
+}
+
 #urlbar {
-  width: 100%;
+  flex: 1;
   height: 30px;
   border-radius: 15px;
   border: 1px solid var(--border);
   padding: 0 14px;
   font-size: 14px;
-  outline: none;
 }
 
-/* ===== 表示領域 ===== */
+/* ===== 表示 ===== */
 #view-container {
   width: 100vw;
   height: calc(100vh - 80px);
-  background: #fff;
 }
 
 .webview {
@@ -112,9 +129,37 @@ body {
   height: 100%;
 }
 
-/* ===== 右クリックメニュー ===== */
-#context-menu {
+/* ===== 履歴 ===== */
+#historyPopup {
   position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 999;
+}
+
+.history-item {
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #f2f2f2;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== 右クリック ===== */
+#context-menu {
+  position: fixed;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -122,12 +167,40 @@ body {
   z-index: 9999;
 }
 
-#context-menu div {
-  padding: 8px 14px;
+.context-item {
+  padding: 8px 12px;
   cursor: pointer;
-  font-size: 13px;
 }
 
-#context-menu div:hover {
+.context-item:hover {
   background: #f0f0f0;
+}
+
+#tabs {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;       /* 横スクロール可能に */
+  white-space: nowrap;    /* タブを折り返さない */
+  -webkit-overflow-scrolling: touch; /* スマホでも滑らか */
+}
+
+.tab {
+  flex: 0 0 auto;         /* 横幅固定（縮めない） */
+  padding: 6px 12px;
+  margin-right: 2px;
+  border-radius: 4px 4px 0 0;
+  background: #eee;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+.tab.active {
+  background: #fff;
+  border-bottom: 2px solid #4285f4;
+}
+
+.tab.dragging {
+  transition: none;
+  z-index: 10;
 }
