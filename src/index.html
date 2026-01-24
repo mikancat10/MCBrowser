@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>MCBrowser</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="titlebar">
-    <div id="tabs"></div>
-    <button id="newTabBtn">＋</button>
-  </div>
+<!-- ===== タイトルバー ===== -->
+<div id="titlebar">
+  <div id="tabs"></div>
+  <button id="newTabBtn">＋</button>
+</div>
 
-  <div id="nav">
-    <input id="urlbar" placeholder="検索または URL を入力" />
-  </div>
+<!-- ===== ナビ ===== -->
+<div id="nav">
+  <button class="nav-btn" id="backBtn">←</button>
+  <button class="nav-btn" id="forwardBtn">→</button>
+  <button class="nav-btn" id="homeBtn">🏠</button>
+  <button class="nav-btn" id="historyBtn">☰</button>
+  <input id="urlbar" placeholder="検索または URL を入力">
+</div>
 
-  <div id="view-container"></div>
+<!-- ===== 履歴 ===== -->
+<div id="historyPopup" class="hidden"></div>
 
-  <script src="renderer.js"></script>
+<!-- ===== 表示領域 ===== -->
+<div id="view-container"></div>
+
+<script src="renderer.js"></script>
 </body>
 </html>
