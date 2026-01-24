@@ -1,87 +1,87 @@
-/* --- Demo専用：高精度シミュレーターUI --- */
 :root {
-    --ui-base: #1e1e1e;
-    --ui-toolbar: #2d2d2d;
-    --ui-active-tab: #3a3a3a;
-    --ui-text: #e0e0e0;
-    --ui-border: rgba(255, 255, 255, 0.1);
+    --bg-main: #121212;
+    --bg-bar: #202124;
+    --bg-tab: #292a2d;
+    --bg-tab-active: #35363a;
+    --accent: #8ab4f8;
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #e8eaed;
 }
 
 body.demo-mode {
-    background: #121212;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0; height: 100vh;
+    background: radial-gradient(circle at center, #1e1e2e, #000);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-/* ブラウザの外枠（シャドウと面取り） */
+/* ウィンドウ外枠 */
 .browser-window {
-    width: 90vw;
-    height: 85vh;
-    background: var(--ui-base);
+    width: 94vw; height: 88vh;
+    background: var(--bg-main);
     border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
-    border: 1px solid var(--ui-border);
+    display: flex; flex-direction: column;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
     overflow: hidden;
 }
 
-/* タブバーの設計：アクティブなタブが浮き上がる */
-.tab-strip {
-    height: 40px;
-    display: flex;
-    align-items: flex-end;
-    padding: 0 8px;
-    background: #000;
-    gap: 4px;
+/* タイトルバーとタブ */
+#titlebar {
+    height: 44px; background: var(--bg-bar);
+    display: flex; align-items: center; padding: 0 10px; gap: 8px;
+}
+
+#tabs {
+    display: flex; flex: 1; overflow-x: auto; gap: 4px;
+    scrollbar-width: none; align-items: flex-end; height: 100%;
 }
 
 .tab {
-    height: 32px;
-    min-width: 160px;
-    background: var(--ui-toolbar);
-    border-radius: 8px 8px 0 0;
-    color: #888;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    cursor: pointer;
-    transition: 0.2s;
+    min-width: 160px; height: 34px; background: var(--bg-tab);
+    border-radius: 8px 8px 0 0; padding: 0 12px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: #9aa0a6; cursor: pointer;
+    transition: 0.2s; user-select: none; position: relative;
 }
 
-.tab.active {
-    background: var(--ui-base);
-    color: var(--ui-text);
+.tab.active { background: var(--bg-tab-active); color: var(--text); }
+.tab.pinned { min-width: 45px; width: 45px; justify-content: center; }
+.tab.pinned span:first-child { display: none; }
+.tab.pinned::after { content: "📌"; font-size: 12px; }
+
+/* ナビバー */
+#nav {
+    height: 48px; background: var(--bg-tab-active);
+    display: flex; align-items: center; padding: 0 15px; gap: 15px;
+    border-bottom: 1px solid var(--border);
 }
 
-/* ツールバー：アイコンの整列 */
-.toolbar {
-    height: 48px;
-    background: var(--ui-base);
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 12px;
-    border-bottom: 1px solid var(--ui-border);
+.nav-btn {
+    background: transparent; border: none; color: var(--text);
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
 }
+.nav-btn:hover { background: rgba(255,255,255,0.1); }
 
-#url-field {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid transparent;
-    border-radius: 6px;
-    height: 28px;
-    color: #fff;
-    padding: 0 15px;
-    transition: 0.2s;
+#urlbar {
+    flex: 1; height: 32px; border-radius: 20px;
+    background: #202124; border: 1px solid transparent;
+    color: white; padding: 0 15px; outline: none;
 }
+#urlbar:focus { border-color: var(--accent); }
 
-#url-field:focus {
-    background: #000;
-    border-color: #0071e3;
-    outline: none;
+/* 表示エリア */
+#view-container { flex: 1; background: white; }
+iframe { width: 100%; height: 100%; border: none; }
+
+/* 右クリックメニュー */
+.context-menu {
+    position: fixed; background: #2f3033; border: 1px solid #444;
+    border-radius: 8px; color: white; min-width: 180px; padding: 5px 0;
+    z-index: 10000; font-size: 13px;
 }
+.context-item { padding: 8px 15px; cursor: pointer; }
+.context-item:hover { background: #3c4043; }
+
+.hidden { display: none; }
+.shadow-glass { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
