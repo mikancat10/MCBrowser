@@ -204,3 +204,26 @@ body {
   transition: none;
   z-index: 10;
 }
+
+.tab.pinned {
+  width: 36px;
+  font-size: 0;
+}
+.tab.pinned span:first-child::after {
+  content: "📌";
+  font-size: 16px;
+}
+
+.tab.pinned {
+  width: 36px !important;
+  font-size: 0;
+  cursor: default;
+}
+.tab.pinned span:first-child::after {
+  content: "📌";
+  font-size: 16px;
+  display: inline-block;
+}
+.tab.pinned.dragging {
+  cursor: default;
+}
