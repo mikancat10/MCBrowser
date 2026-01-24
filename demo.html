@@ -2,33 +2,36 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>MCBrowser Demo - Full Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCBrowser | Interactive Demo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="browser.css">
 </head>
-<body class="demo-page">
-    <div class="browser-container">
-        <div class="tab-bar">
+<body class="demo-mode">
+
+    <div class="browser-window">
+        <div id="titlebar">
             <div id="tabs"></div>
-            <i class="fas fa-plus" id="newTabBtn"></i>
+            <button id="newTabBtn" title="新しいタブ"><i class="fas fa-plus"></i></button>
         </div>
 
-        <div class="toolbar">
-            <div class="nav-btns">
-                <i class="fas fa-chevron-left" id="backBtn"></i>
-                <i class="fas fa-chevron-right" id="forwardBtn"></i>
-                <i class="fas fa-home" id="homeBtn"></i>
+        <div id="nav">
+            <div class="nav-controls">
+                <button class="nav-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+                <button class="nav-btn" id="forwardBtn"><i class="fas fa-arrow-right"></i></button>
+                <button class="nav-btn" id="homeBtn"><i class="fas fa-home"></i></button>
+                <button class="nav-btn" id="historyBtn"><i class="fas fa-history"></i></button>
             </div>
-            <input type="text" id="urlbar" placeholder="検索、または URL を入力">
-            <div class="nav-btns">
-                <i class="fas fa-history" id="historyBtn"></i>
-            </div>
-            <div id="historyPopup" class="hidden"></div>
+            <input id="urlbar" type="text" placeholder="検索または URL を入力 (例: google.com)">
         </div>
+
+        <div id="historyPopup" class="hidden shadow-glass"></div>
 
         <div id="view-container"></div>
     </div>
 
-    <script src="browser.js"></script>
+    <div id="contextMenu" class="context-menu hidden shadow-glass"></div>
+
+    <script src="js/browser.js"></script>
 </body>
 </html>
