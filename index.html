@@ -3,211 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCBrowser | Next Generation Minimalist Browser</title>
+    <title>MCBrowser | The New Standard of Browsing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --accent-color: #3498db;
-            --text-color: #ffffff;
-            --sub-text: #a0a0a0;
-            --card-bg: #161616;
+            --bg-dark: #050505;
+            --accent-blue: #007aff;
+            --accent-purple: #5856d6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f5f5f7;
+            --text-dim: #86868b;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
 
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Navigation */
+        /* Hero Background Animation */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
+            z-index: -1;
+        }
+
+        /* Navbar */
         nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 20px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 10%;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            width: 80%;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
             z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
+        .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; color: var(--text-main); }
+        .nav-links a { color: var(--text-dim); text-decoration: none; margin-left: 25px; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent-blue); }
 
-        .nav-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            margin-left: 30px;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
+        /* Section Styling */
+        section { padding: 120px 10%; min-height: 80vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
-        .nav-links a:hover {
-            color: var(--accent-color);
-        }
-
-        /* Hero Section */
-        header {
-            height: 100vh;
+        /* Hero */
+        #hero {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-            padding: 0 20px;
         }
 
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .hero-sub {
-            font-size: 1.2rem;
-            color: var(--sub-text);
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            background-color: var(--text-color);
-            color: var(--bg-color);
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-color);
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        /* Screenshot Section */
-        .preview {
-            padding: 100px 10%;
-            text-align: center;
-        }
-
-        .browser-mockup {
-            border: 1px solid #333;
-            border-radius: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            max-width: 100%;
-            transition: 0.5s;
-        }
-
-        /* Features Section */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            padding: 100px 10%;
-            background-color: #0d0d0d;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 15px;
-            text-align: left;
-            transition: 0.3s;
-            border: 1px solid #222;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-5px);
-        }
-
-        .feature-card i {
-            font-size: 2rem;
-            color: var(--accent-color);
+        .gradient-text {
+            background: linear-gradient(90deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 5rem;
+            font-weight: 800;
             margin-bottom: 20px;
         }
 
-        .feature-card h3 {
-            margin-bottom: 15px;
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 50px;
         }
 
-        .feature-card p {
-            color: var(--sub-text);
-            font-size: 0.9rem;
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* Footer */
-        footer {
-            padding: 50px 10%;
-            text-align: center;
-            color: var(--sub-text);
-            font-size: 0.8rem;
-            border-top: 1px solid #1a1a1a;
+        .glass-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--accent-blue);
         }
+
+        .glass-card i { font-size: 2rem; color: var(--accent-blue); margin-bottom: 20px; }
+        .glass-card h3 { font-size: 1.5rem; margin-bottom: 15px; }
+        .glass-card p { color: var(--text-dim); }
+
+        /* Tech Details Section */
+        #about-tech { background: #080808; }
+        .tech-info { display: flex; align-items: center; gap: 50px; margin-top: 40px; }
+        .tech-text { flex: 1; }
+        .tech-visual { flex: 1; background: linear-gradient(45deg, #111, #222); height: 300px; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px dashed #444; }
+
+        /* CTA Button */
+        .cta-btn {
+            background: var(--accent-blue);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+            transition: 0.3s;
+        }
+        .cta-btn:hover { transform: scale(1.05); background: #0084ff; }
+
+        footer { text-align: center; padding: 60px; color: var(--text-dim); border-top: 1px solid var(--glass-border); }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            nav { width: 90%; padding: 20px 5%; }
-            .nav-links { display: none; }
+            .gradient-text { font-size: 3rem; }
+            .tech-info { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-glow"></div>
+
     <nav>
-        <div class="logo">MCBrowser</div>
+        <div class="logo">MCBROWSER</div>
         <div class="nav-links">
-            <a href="#features">Features</a>
+            <a href="#hero">Home</a>
+            <a href="#about-tech">Technology</a>
+            <a href="#privacy">Privacy</a>
             <a href="https://github.com/mikancat10/MCBrowser">GitHub</a>
-            <a href="https://github.com/mikancat10/MCBrowser/releases/download/MCBrowserV3/MCBrowserV3.zip" class="btn" style="padding: 8px 20px; margin-left: 20px;">Download</a>
         </div>
     </nav>
 
-    <header>
-        <h1>Focus on the Web.</h1>
-        <p class="hero-sub">無駄を削ぎ落とした、黒が映える究極のミニマルブラウザ。</p>
-        <a href="https://github.com/mikancat10/MCBrowser" class="btn">GitHubで見る</a>
-    </header>
-
-    <section class="preview" id="preview">
-        <img src="images/screenshot1.png" alt="MCBrowser UI" class="browser-mockup" onerror="this.src='https://via.placeholder.com/1000x600/161616/ffffff?text=MCBrowser+UI+Preview'">
+    <section id="hero">
+        <h1 class="gradient-text">Beyond the Window.</h1>
+        <p style="font-size: 1.5rem; color: var(--text-dim);">MCBrowserは、あなたのデスクトップに静寂とスピードをもたらします。</p>
+        <a href="https://github.com/mikancat10/MCBrowser" class="cta-btn">Start Development</a>
     </section>
 
-    <section class="features" id="features">
-        <div class="feature-card">
-            <i class="fas fa-moon"></i>
-            <h3>True Dark Mode</h3>
-            <p>目に優しい完全なダークUI。夜間のブラウジングも快適に、コンテンツに没入できます。</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-wind"></i>
-            <h3>Lightweight</h3>
-            <p>Electronのパワーを活用し、不要なトラッカーや重い装飾を排除。高速な起動を実現しました。</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-clock"></i>
-            <h3>Simple Start</h3>
-            <p>新しいタブは時計と検索だけ。何をするべきか、迷うことはありません。</p>
+    <section id="about-tech">
+        <div class="container">
+            <h2>Core Technology</h2>
+            <div class="tech-info">
+                <div class="tech-text">
+                    <h3>Electron Powered.</h3>
+                    <p style="color: var(--text-dim); margin-top: 15px;">
+                        Chromiumエンジンの堅牢性とNode.jsの柔軟性を融合。ウェブ標準の技術をネイティブアプリのパフォーマンスで提供します。
+                        高度なメモリ最適化により、従来のブラウザよりもリソース消費を抑えたブラウジングが可能です。
+                    </p>
+                </div>
+                <div class="tech-visual">
+                    <code>// Optimized Runtime Rendering Engine</code>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer id="download">
+    <section id="features">
+        <div class="container">
+            <h2>Detailed Features</h2>
+            <div class="grid">
+                <div class="glass-card">
+                    <i class="fas fa-shield-halved"></i>
+                    <h3>Privacy First</h3>
+                    <p>ユーザー行動の追跡を一切行いません。あなたのデータはあなたのデバイス内でのみ処理されます。</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Dev Friendly</h3>
+                    <p>開発者向けのデバッグツールやカスタムCSS機能を統合。自分好みのブラウザに改造できます。</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-microchip"></i>
+                    <h3>Modern Engine</h3>
+                    <p>常に最新のChromiumコアを維持し、最新のWeb規格（WebGPU, WASM等）に完全対応。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="privacy">
+        <div class="container" style="text-align: center;">
+            <h2>Your Security. Our Priority.</h2>
+            <p style="color: var(--text-dim); max-width: 700px; margin: 20px auto;">
+                MCBrowserは「何もしない」という最高のセキュリティを提供します。
+                不要なクラウド同期やテレメトリ（データ収集）を全てカット。
+                オフライン時でも変わらないパフォーマンスを。
+            </p>
+            <div class="grid" style="margin-top: 30px;">
+                <div class="glass-card">
+                    <h3>No Tracking</h3>
+                    <p>広告IDやCookieの不審な挙動を監視。</p>
+                </div>
+                <div class="glass-card">
+                    <h3>Sandboxing</h3>
+                    <p>各タブを独立したプロセスで実行し、安全性を確保。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
         <p>&copy; 2026 MCBrowser Project. Created by mikancat10.</p>
-        <p style="margin-top: 10px;">
-            <a href="https://github.com/mikancat10/MCBrowser" style="color: var(--sub-text); text-decoration: none;">
-                <i class="fab fa-github"></i> View on GitHub
-            </a>
-        </p>
     </footer>
 
 </body>
