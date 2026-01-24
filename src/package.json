@@ -17,9 +17,7 @@
     "directories": {
       "output": "dist"
     },
-    "files": [
-      "**/*"
-    ],
+    "files": ["**/*"],
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico"
