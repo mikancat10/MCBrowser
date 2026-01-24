@@ -1,6 +1,6 @@
 # MCBrowser 🌐
 
-![Version](https://img.shields.io/badge/version-v3.0.0--beta-blue)
+![Version](https://img.shields.io/badge/version-v4.0.0--beta-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 
