@@ -1,230 +1,214 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MCBrowser - Next Generation Browser</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCBrowser | Next Generation Minimalist Browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --accent-color: #3498db;
+            --text-color: #ffffff;
+            --sub-text: #a0a0a0;
+            --card-bg: #161616;
+        }
 
-<style>
-:root {
-  --bg-color: #0d0d0d;
-  --panel-color: #1a1a1a;
-  --accent-color: #3b82f6; /* 鮮やかなブルー */
-  --text-main: #ffffff;
-  --text-sub: #a0a0a0;
-  --border: rgba(255, 255, 255, 0.1);
-}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 80%;
+            z-index: 1000;
+        }
 
-body {
-  background-color: var(--bg-color);
-  background-image: radial-gradient(circle at 50% -20%, #222 0%, #0d0d0d 80%);
-  color: var(--text-main);
-  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-  line-height: 1.6;
-}
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
 
-/* ---------- Layout ---------- */
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
 
-/* ---------- Header ---------- */
-header {
-  padding: 120px 20px 80px;
-  text-align: center;
-}
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
 
-header h1 {
-  font-size: clamp(48px, 8vw, 72px);
-  font-weight: 800;
-  letter-spacing: -2px;
-  background: linear-gradient(to bottom, #fff, #888);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-}
+        /* Hero Section */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            padding: 0 20px;
+        }
 
-header p {
-  color: var(--text-sub);
-  font-size: 1.2rem;
-  letter-spacing: 0.1em;
-}
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
 
-/* ---------- Sections ---------- */
-section {
-  margin-bottom: 120px;
-}
+        .hero-sub {
+            font-size: 1.2rem;
+            color: var(--sub-text);
+            margin-bottom: 30px;
+        }
 
-h2 {
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--accent-color);
-  margin-bottom: 32px;
-  text-align: center;
-}
+        .btn {
+            padding: 12px 30px;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
 
-/* ---------- Main Card (About) ---------- */
-.main-card {
-  background: var(--panel-color);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 48px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-3px);
+        }
 
-.main-card p {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  color: #ddd;
-}
+        /* Screenshot Section */
+        .preview {
+            padding: 100px 10%;
+            text-align: center;
+        }
 
-/* ---------- Feature Grid ---------- */
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
+        .browser-mockup {
+            border: 1px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 100%;
+            transition: 0.5s;
+        }
 
-.feature-box {
-  background: #151515;
-  border: 1px solid var(--border);
-  padding: 32px;
-  border-radius: 20px;
-  transition: 0.3s ease;
-}
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 100px 10%;
+            background-color: #0d0d0d;
+        }
 
-.feature-box:hover {
-  border-color: var(--accent-color);
-  transform: translateY(-5px);
-}
+        .feature-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: left;
+            transition: 0.3s;
+            border: 1px solid #222;
+        }
 
-.feature-box h3 {
-  margin-bottom: 12px;
-  font-size: 1.2rem;
-}
+        .feature-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
 
-.feature-box p {
-  color: var(--text-sub);
-  font-size: 0.95rem;
-}
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
 
-/* ---------- Single Screenshot ---------- */
-.screenshot-container {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.7);
-}
+        .feature-card h3 {
+            margin-bottom: 15px;
+        }
 
-.screenshot-container img {
-  width: 100%;
-  display: block;
-  filter: brightness(0.9);
-  transition: 0.5s;
-}
+        .feature-card p {
+            color: var(--sub-text);
+            font-size: 0.9rem;
+        }
 
-.screenshot-container:hover img {
-  filter: brightness(1);
-}
+        /* Footer */
+        footer {
+            padding: 50px 10%;
+            text-align: center;
+            color: var(--sub-text);
+            font-size: 0.8rem;
+            border-top: 1px solid #1a1a1a;
+        }
 
-/* ---------- Download Area ---------- */
-.download-area {
-  text-align: center;
-  padding: 60px 0;
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  padding: 18px 48px;
-  background: #fff;
-  color: #000;
-  text-decoration: none;
-  font-weight: 700;
-  border-radius: 999px;
-  transition: 0.3s;
-  font-size: 1.1rem;
-}
-
-.btn-primary:hover {
-  background: var(--accent-color);
-  color: #fff;
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-}
-
-/* ---------- Footer ---------- */
-footer {
-  padding: 60px 0;
-  border-top: 1px solid var(--border);
-  text-align: center;
-  color: #444;
-  font-size: 0.9rem;
-}
-</style>
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            nav { width: 90%; padding: 20px 5%; }
+            .nav-links { display: none; }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-  <h1>MCBrowser</h1>
-  <p>Lightweight & Modern Performance</p>
-</header>
+    <nav>
+        <div class="logo">MCBrowser</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="https://github.com/mikancat10/MCBrowser">GitHub</a>
+            <a href="https://github.com/mikancat10/MCBrowser/releases/download/MCBrowserV3/MCBrowserV3.zip" class="btn" style="padding: 8px 20px; margin-left: 20px;">Download</a>
+        </div>
+    </nav>
 
-<div class="container">
-  <section>
-    <h2>Concept</h2>
-    <div class="main-card">
-      <p>MCBrowser は Electron ベースで構築された、ミニマリズムと機能を両立させた次世代ブラウザです。</p>
-      <p>余計な装飾を削ぎ落とし、<strong>黒を基調とした洗練されたUI</strong>が、あなたのブラウジング体験をより没入感のあるものへと変えます。</p>
-    </div>
-  </section>
+    <header>
+        <h1>Focus on the Web.</h1>
+        <p class="hero-sub">無駄を削ぎ落とした、黒が映える究極のミニマルブラウザ。</p>
+        <a href="https://github.com/mikancat10/MCBrowser" class="btn">GitHubで見る</a>
+    </header>
 
-  <section>
-    <h2>Features</h2>
-    <div class="features">
-      <div class="feature-box">
-        <h3>Custom NewTab</h3>
-        <p>時計、検索、ミニマルな壁紙。必要なものだけを配置した初期画面。</p>
-      </div>
-      <div class="feature-box">
-        <h3>Smart Tab</h3>
-        <p>直感的なタブ操作と、無駄のないメモリ管理を実現。</p>
-      </div>
-      <div class="feature-box">
-        <h3>Native Menu</h3>
-        <p>独自に拡張された右クリックメニューで、操作をよりスピーディーに。</p>
-      </div>
-    </div>
-  </section>
+    <section class="preview" id="preview">
+        <img src="images/screenshot1.png" alt="MCBrowser UI" class="browser-mockup" onerror="this.src='https://via.placeholder.com/1000x600/161616/ffffff?text=MCBrowser+UI+Preview'">
+    </section>
 
-  <section>
-    <h2>Interface</h2>
-    <div class="screenshot-container">
-      <img src="images/screenshot1.png" alt="MCBrowser UI Preview">
-    </div>
-  </section>
+    <section class="features" id="features">
+        <div class="feature-card">
+            <i class="fas fa-moon"></i>
+            <h3>True Dark Mode</h3>
+            <p>目に優しい完全なダークUI。夜間のブラウジングも快適に、コンテンツに没入できます。</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-wind"></i>
+            <h3>Lightweight</h3>
+            <p>Electronのパワーを活用し、不要なトラッカーや重い装飾を排除。高速な起動を実現しました。</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-clock"></i>
+            <h3>Simple Start</h3>
+            <p>新しいタブは時計と検索だけ。何をするべきか、迷うことはありません。</p>
+        </div>
+    </section>
 
-  <section class="download-area">
-    <h2>Get Started</h2>
-    <p style="margin-bottom: 30px; color: var(--text-sub);">現在開発中。GitHubにてソースコードとビルドを公開予定。</p>
-    <a href="https://github.com/mikancat10/MCBrowser" class="btn-primary">GitHub Repository</a>
-  </section>
-</div>
-
-<footer>
-  &copy; 2026 MCBrowser Project. Developed by mikancat10.
-</footer>
+    <footer id="download">
+        <p>&copy; 2026 MCBrowser Project. Created by mikancat10.</p>
+        <p style="margin-top: 10px;">
+            <a href="https://github.com/mikancat10/MCBrowser" style="color: var(--sub-text); text-decoration: none;">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </p>
+    </footer>
 
 </body>
 </html>
