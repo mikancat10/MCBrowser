@@ -2,28 +2,84 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>MCBrowser | Beyond the Window</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCBrowser | The New Standard of Browsing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="site-main">
+<body>
     <div class="bg-glow"></div>
+
     <nav>
         <div class="logo">MCBROWSER</div>
         <div class="nav-links">
             <a href="#hero">Home</a>
-            <a href="demo.html">Interactive Demo</a>
-            <a href="https://github.com/mikancat10/MCBrowser" target="_blank">GitHub</a>
+            <a href="#about-tech">Technology</a>
+            <a href="#privacy">Privacy</a>
+            <a href="demo.html" class="demo-link">Live Demo</a>
         </div>
     </nav>
 
     <section id="hero">
+        <h1 class="gradient-text">Beyond the Window.</h1>
+        <p class="hero-sub">MCBrowserは、あなたのデスクトップに静寂とスピードをもたらします。</p>
+        <div class="cta-area">
+            <a href="https://github.com/mikancat10/MCBrowser" class="cta-btn main">Start Development</a>
+            <a href="demo.html" class="cta-btn outline">Try Online Demo</a>
+        </div>
+    </section>
+
+    <section id="about-tech">
         <div class="container">
-            <h1 class="gradient-text">Beyond the Window.</h1>
-            <p class="subtitle">ミニマリズムと没入感を追求した、次世代のウェブブラウザ。</p>
-            <div class="cta-group">
-                <a href="demo.html" class="cta-btn primary">デモを体験する</a>
-                <a href="https://github.com/mikancat10/MCBrowser" class="cta-btn secondary">GitHubへ</a>
+            <h2>Core Technology</h2>
+            <div class="tech-info">
+                <div class="tech-text">
+                    <h3>Electron Powered.</h3>
+                    <p>Chromiumエンジンの堅牢性とNode.jsの柔軟性を融合。ウェブ標準の技術をネイティブアプリのパフォーマンスで提供します。</p>
+                </div>
+                <div class="tech-visual">
+                    <code>// Optimized Runtime Rendering Engine</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <h2>Detailed Features</h2>
+            <div class="grid">
+                <div class="glass-card">
+                    <i class="fas fa-shield-halved"></i>
+                    <h3>Privacy First</h3>
+                    <p>ユーザー行動の追跡を一切行いません。データはあなたのデバイス内のみで処理されます。</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Dev Friendly</h3>
+                    <p>開発者向けのデバッグツールやカスタムCSS機能を統合。自分好みのブラウザに改造できます。</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-microchip"></i>
+                    <h3>Modern Engine</h3>
+                    <p>常に最新のChromiumコアを維持し、最新のWeb規格（WebGPU等）に完全対応。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="privacy">
+        <div class="container center">
+            <h2>Your Security. Our Priority.</h2>
+            <p class="description">MCBrowserは「何もしない」という最高のセキュリティを提供します。不要なクラウド同期やテレメトリを全てカット。オフラインでも変わらないパフォーマンスを。</p>
+            <div class="grid">
+                <div class="glass-card">
+                    <h3>No Tracking</h3>
+                    <p>広告IDやCookieの不審な挙動を監視。</p>
+                </div>
+                <div class="glass-card">
+                    <h3>Sandboxing</h3>
+                    <p>各タブを独立したプロセスで実行し、安全性を確保。</p>
+                </div>
             </div>
         </div>
     </section>
