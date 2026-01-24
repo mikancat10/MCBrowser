@@ -1,260 +1,194 @@
 const tabsEl = document.getElementById("tabs");
 const viewContainer = document.getElementById("view-container");
-const newTabBtn = document.getElementById("newTabBtn");
 const urlbar = document.getElementById("urlbar");
+
+const backBtn = document.getElementById("backBtn");
+const forwardBtn = document.getElementById("forwardBtn");
+const homeBtn = document.getElementById("homeBtn");
+const historyBtn = document.getElementById("historyBtn");
+const newTabBtn = document.getElementById("newTabBtn");
+const historyPopup = document.getElementById("historyPopup");
 
 let tabs = [];
 let activeTabId = null;
+let historyList = JSON.parse(localStorage.getItem("history") || "[]");
+
+/* ===== NewTab HTML ===== */
+function newTabHTML() {
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8"><title>New Tab</title>
+<style>
+*{box-sizing:border-box;font-family:Segoe UI,system-ui}
+body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f5f5,#e9e9e9)}
+.clock{font-size:72px;font-weight:300}
+.date{font-size:14px;color:#666}
+input{width:420px;height:42px;margin-top:28px;border-radius:21px;border:1px solid #ccc;padding:0 18px;font-size:15px}
+</style></head>
+<body>
+<div style="text-align:center">
+<div id="clock" class="clock"></div>
+<div id="date" class="date"></div>
+<input id="search" placeholder="検索または URL を入力" autofocus>
+</div>
+<script>
+function u(){const n=new Date();clock.textContent=String(n.getHours()).padStart(2,'0')+":"+String(n.getMinutes()).padStart(2,'0')+":"+String(n.getSeconds()).padStart(2,'0');date.textContent=n.toLocaleDateString("ja-JP",{weekday:"short",year:"numeric",month:"long",day:"numeric"});}
+u();setInterval(u,1000);
+search.onkeydown=e=>{if(e.key!=="Enter")return;let v=e.target.value.trim();if(!v.startsWith("http"))v="https://www.google.com/search?q="+encodeURIComponent(v);location.href=v;}
+</script></body></html>`;
+}
 
 /* ===== タブ作成 ===== */
 function createTab(url = "newtab") {
   const id = Date.now().toString();
-
   const tabBtn = document.createElement("div");
   tabBtn.className = "tab";
-
-  const title = document.createElement("span");
-  title.textContent = url === "newtab" ? "New Tab" : "Loading...";
-
-  const closeBtn = document.createElement("span");
-  closeBtn.textContent = "×";
-  closeBtn.className = "tab-close";
-  closeBtn.onclick = e => {
-    e.stopPropagation();
-    closeTab(id);
-  };
-
-  tabBtn.append(title, closeBtn);
+  tabBtn.innerHTML = `<span>New Tab</span><span class="tab-close">×</span>`;
   tabBtn.onclick = () => activateTab(id);
-
-  tabBtn.oncontextmenu = e => {
-    e.preventDefault();
-    showTabMenu(e.pageX, e.pageY, id);
-  };
-
-  tabsEl.appendChild(tabBtn);
+  tabBtn.querySelector(".tab-close").onclick = e => { e.stopPropagation(); closeTab(id); };
 
   const webview = document.createElement("webview");
   webview.className = "webview";
   webview.style.display = "none";
+  webview.src = url === "newtab" ? "data:text/html," + encodeURIComponent(newTabHTML()) : url;
 
-  webview.src =
-    url === "newtab"
-      ? "data:text/html," + encodeURIComponent(newTabHTML())
-      : url;
+  webview.addEventListener("page-title-updated", e => { tabBtn.querySelector("span").textContent = e.title || "New Tab"; });
+  webview.addEventListener("did-navigate", e => { urlbar.value = e.url; addHistory(e.url, webview.getTitle()); });
 
+  tabsEl.appendChild(tabBtn);
   viewContainer.appendChild(webview);
-
   tabs.push({ id, tabBtn, webview });
+
   activateTab(id);
+
+  initTabDrag(tabBtn);
 }
 
-/* ===== タブ切替 ===== */
+/* ===== タブドラッグ Chrome級 ===== */
+/* ===== 磁石＋Chrome級タブドラッグ + 横スクロール ===== */
+function initTabDrag() {
+  let dragTab = null;
+  let startX = 0;
+  let currentX = 0;
+  let dragIndex = 0;
+  let animationFrame = null;
+
+  function onPointerMove(e) {
+    if (!dragTab) return;
+    currentX = e.clientX;
+    const dx = currentX - startX;
+    dragTab.style.transform = `translateX(${dx}px)`;
+
+    const rect = dragTab.getBoundingClientRect();
+    const containerRect = tabsEl.getBoundingClientRect();
+
+    // 自動横スクロール
+    const edgeThreshold = 50;
+    const scrollSpeed = 8;
+    if (rect.left < containerRect.left + edgeThreshold) {
+      tabsEl.scrollLeft -= scrollSpeed;
+    } else if (rect.right > containerRect.right - edgeThreshold) {
+      tabsEl.scrollLeft += scrollSpeed;
+    }
+
+    // タブ入れ替え
+    const index = tabs.findIndex(t => t.tabBtn === dragTab);
+    tabs.forEach((t, i) => {
+      if (t.tabBtn === dragTab) return;
+      const r = t.tabBtn.getBoundingClientRect();
+      const mid = r.left + r.width / 2;
+
+      if (dx > 0 && rect.right > mid && i > index) reorderTabs(index, i);
+      if (dx < 0 && rect.left < mid && i < index) reorderTabs(index, i);
+    });
+  }
+
+  function onPointerUp(e) {
+    if (!dragTab) return;
+    dragTab.releasePointerCapture(e.pointerId);
+    dragTab.classList.remove("dragging");
+    dragTab.style.transform = "";
+    dragTab = null;
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+  }
+
+  tabsEl.addEventListener("pointerdown", e => {
+    const tab = e.target.closest(".tab");
+    if (!tab || e.target.classList.contains("tab-close")) return;
+
+    dragTab = tab;
+    startX = e.clientX;
+    dragIndex = tabs.findIndex(t => t.tabBtn === dragTab);
+
+    dragTab.classList.add("dragging");
+    dragTab.setPointerCapture(e.pointerId);
+
+    function frame() {
+      onPointerMove(e);
+      animationFrame = requestAnimationFrame(frame);
+    }
+    frame();
+  });
+
+  document.addEventListener("pointermove", onPointerMove);
+  document.addEventListener("pointerup", onPointerUp);
+}
+
+
+/* ===== 並び替え ===== */
+function reorderTabs(from, to) {
+  if (from === to) return;
+  const moved = tabs.splice(from, 1)[0];
+  tabs.splice(to, 0, moved);
+  tabsEl.insertBefore(moved.tabBtn, tabsEl.children[to]);
+  viewContainer.insertBefore(moved.webview, viewContainer.children[to]);
+}
+
+/* ===== タブ制御 ===== */
 function activateTab(id) {
-  tabs.forEach(t => {
-    t.tabBtn.classList.remove("active");
-    t.webview.style.display = "none";
-  });
-
-  const tab = tabs.find(t => t.id === id);
-  if (!tab) return;
-
-  tab.tabBtn.classList.add("active");
-  tab.webview.style.display = "flex";
+  tabs.forEach(t => { t.tabBtn.classList.remove("active"); t.webview.style.display = "none"; });
+  const t = tabs.find(t => t.id === id);
+  if (!t) return;
+  t.tabBtn.classList.add("active");
+  t.webview.style.display = "flex";
   activeTabId = id;
+  scrollActiveTabIntoView(t.tabBtn);
 }
 
-/* ===== タブを閉じる ===== */
 function closeTab(id) {
-  const index = tabs.findIndex(t => t.id === id);
-  if (index === -1) return;
-
-  const tab = tabs[index];
-  tab.tabBtn.remove();
-  tab.webview.remove();
-  tabs.splice(index, 1);
-
-  if (activeTabId === id && tabs.length) {
-    activateTab(tabs[Math.max(0, index - 1)].id);
-  }
+  const i = tabs.findIndex(t => t.id === id);
+  if (i === -1) return;
+  tabs[i].tabBtn.remove();
+  tabs[i].webview.remove();
+  tabs.splice(i, 1);
+  if (!tabs.length) createTab();
+  else activateTab(tabs[Math.max(0, i - 1)].id);
 }
 
-/* ===== URLバー ===== */
-urlbar.addEventListener("keydown", e => {
-  if (e.key === "Enter" && activeTabId) {
-    let url = urlbar.value.trim();
-    if (!url.startsWith("http")) {
-      url = "https://www.google.com/search?q=" + encodeURIComponent(url);
-    }
-    tabs.find(t => t.id === activeTabId).webview.src = url;
-  }
-});
+/* ===== ナビ ===== */
+function activeWebview() { return tabs.find(t => t.id === activeTabId)?.webview; }
+backBtn.onclick = () => activeWebview()?.goBack();
+forwardBtn.onclick = () => activeWebview()?.goForward();
+homeBtn.onclick = () => activeWebview().src = "data:text/html," + encodeURIComponent(newTabHTML());
+urlbar.onkeydown = e => { if (e.key!=="Enter") return; let v=urlbar.value.trim(); if(!v.startsWith("http")) v="https://www.google.com/search?q="+encodeURIComponent(v); activeWebview().src=v; };
 
-/* ===== URLバー右クリック ===== */
-urlbar.oncontextmenu = e => {
-  e.preventDefault();
-  showContextMenu(e.pageX, e.pageY, [
-    { label: "コピー", action: () => navigator.clipboard.writeText(urlbar.value) },
-    { label: "ペースト", action: async () => urlbar.value = await navigator.clipboard.readText() }
-  ]);
-};
+/* ===== 履歴 ===== */
+function addHistory(url,title){if(url.startsWith("data:"))return;historyList.unshift({title,url});historyList=historyList.slice(0,100);localStorage.setItem("history",JSON.stringify(historyList));}
+historyBtn.onclick=()=>{historyPopup.innerHTML="";historyList.forEach(h=>{const d=document.createElement("div");d.className="history-item";d.textContent=h.title;d.onclick=()=>{activeWebview().src=h.url;historyPopup.classList.add("hidden");};historyPopup.appendChild(d);});historyPopup.classList.toggle("hidden");};
 
-/* ===== タブ右クリック ===== */
-function showTabMenu(x, y, id) {
-  showContextMenu(x, y, [
-    { label: "タブを閉じる", action: () => closeTab(id) }
-  ]);
-}
-
-/* ===== 共通メニュー ===== */
-function showContextMenu(x, y, items) {
-  removeContextMenu();
-  const menu = document.createElement("div");
-  menu.id = "context-menu";
-  menu.style.left = x + "px";
-  menu.style.top = y + "px";
-
-  items.forEach(i => {
-    const el = document.createElement("div");
-    el.textContent = i.label;
-    el.onclick = () => {
-      i.action();
-      removeContextMenu();
-    };
-    menu.appendChild(el);
-  });
-
-  document.body.appendChild(menu);
-}
-
-function removeContextMenu() {
-  const m = document.getElementById("context-menu");
-  if (m) m.remove();
-}
-
-document.addEventListener("click", removeContextMenu);
-
-/* ===== NewTab ===== */
-function newTabHTML() {
-  return `
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<title>New Tab</title>
-<style>
-  * {
-    box-sizing: border-box;
-    font-family: "Segoe UI", system-ui, sans-serif;
-  }
-
-  body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(
-      135deg,
-      #f5f5f5,
-      #e9e9e9
-    );
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .container {
-    text-align: center;
-  }
-
-  .clock {
-    font-size: 72px;
-    font-weight: 300;
-    color: #222;
-    letter-spacing: 2px;
-  }
-
-  .date {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #666;
-  }
-
-  .search-box {
-    margin-top: 32px;
-  }
-
-  input {
-    width: 420px;
-    height: 42px;
-    border-radius: 21px;
-    border: 1px solid #ccc;
-    padding: 0 18px;
-    font-size: 15px;
-    outline: none;
-    background: #fff;
-  }
-
-  input:focus {
-    border-color: #999;
-  }
-
-  .footer {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #aaa;
-  }
-</style>
-</head>
-
-<body>
-  <div class="container">
-    <div class="clock" id="clock">--:--:--</div>
-    <div class="date" id="date"></div>
-
-    <div class="search-box">
-      <input id="search" placeholder="検索または URL を入力" autofocus />
-    </div>
-
-    <div class="footer">
-      MCBrowser NewTab
-    </div>
-  </div>
-
-<script>
-  function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById("clock").textContent = h + ":" + m + ":" + s;
-
-    document.getElementById("date").textContent =
-      now.toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        weekday: "short"
-      });
-  }
-
-  updateClock();
-  setInterval(updateClock, 1000);
-
-  document.getElementById("search").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      let v = e.target.value.trim();
-      if (!v) return;
-
-      if (!v.startsWith("http")) {
-        v = "https://www.google.com/search?q=" + encodeURIComponent(v);
-      }
-      location.href = v;
-    }
-  });
-</script>
-</body>
-</html>`;
-}
-
-/* ===== 起動時 ===== */
+/* ===== 起動 ===== */
 newTabBtn.onclick = () => createTab();
 createTab();
+
+/* ===== アクティブタブを常に表示 ===== */
+function scrollActiveTabIntoView(tabBtn){
+  const rect = tabBtn.getBoundingClientRect();
+  const container = tabsEl.getBoundingClientRect();
+  const scrollLeft = tabsEl.scrollLeft;
+
+  if(rect.left < container.left){
+    tabsEl.scrollTo({left: scrollLeft + rect.left - container.left -10, behavior:"smooth"});
+  } else if(rect.right > container.right){
+    tabsEl.scrollTo({left: scrollLeft + (rect.right - container.right)+10, behavior:"smooth"});
+  }
+}
