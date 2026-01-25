@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | MCBrowser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+  <style>
+    /* --- FAQ専用スタイル --- */
+.faq-container {
+    padding-top: 150px;
+    padding-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#faq-list {
+    width: 90%;
+    max-width: 800px;
+    margin-top: 40px;
+}
+
+.faq-item {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: 0.3s var(--ease);
+}
+
+.faq-item:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.faq-question {
+    width: 100%;
+    padding: 24px 30px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.faq-question i {
+    transition: 0.4s var(--ease);
+    color: var(--accent);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s var(--ease);
+    padding: 0 30px;
+}
+
+.faq-answer p {
+    color: var(--text-dim);
+    line-height: 1.8;
+    padding-bottom: 24px;
+}
+
+/* アクティブ状態のスタイル */
+.faq-item.active {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px; /* 内容に応じて調整 */
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+}
+  </style>
+<body class="site-home">
+    <div class="visual-wrapper">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2" style="background: #2a1a6c;"></div>
+        <div class="glass-overlay"></div>
+    </div>
+
+    <nav>
+        <div class="logo">MCBROWSER</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="demo.html">Demo</a>
+            <a href="faq.html" style="color: #fff;">FAQ</a>
+        </div>
+    </nav>
+
+    <main class="faq-container">
+        <section id="faq-hero">
+            <div class="badge">Support</div>
+            <h1 class="gradient-text" style="font-size: clamp(2.5rem, 8vw, 4rem);">Questions?</h1>
+            <p class="hero-sub">MCBrowserについて、よくある質問をまとめました。</p>
+        </section>
+
+        <section id="faq-list">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>MCBrowserは無料で使えますか？</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>はい、すべての機能は無料でご利用いただけます。オープンソースプロジェクトとして、コミュニティと共に進化を続けています。</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>他のブラウザとの最大の違いは何ですか？</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>独自開発の「Fluent Tab」エンジンによる直感的な操作感と、プライバシー保護に特化した設計です。不要な広告トラッカーをデフォルトで遮断し、圧倒的な高速化を実現しています。</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>拡張機能（Extensions）は使えますか？</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>現在、Chrome ウェブストアの拡張機能との互換性を開発中です。それ以外は詳しくは言えません。</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>推奨される動作環境を教えてください。</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Windows11 以降で快適に動作します。</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="cta-area" style="margin-top: 60px;">
+            <p class="hero-sub" style="font-size: 1rem;">解決しない場合は</p>
+            <a href="https://github.com/mikancat10/MCBrowser/issues" class="cta-btn outline">GitHubで質問する</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 MCBrowser Project.</p>
+    </footer>
+
+    <script>
+        // アコーディオンの制御ロジック
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                
+                // 他のアイテムを閉じる（1つだけ開くようにする場合）
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (item !== faqItem) item.classList.remove('active');
+                });
+
+                faqItem.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>
