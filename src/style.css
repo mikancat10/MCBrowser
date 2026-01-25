@@ -7,223 +7,68 @@
   --text: #222;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: "Segoe UI", system-ui, sans-serif;
+* { box-sizing: border-box; font-family: "Segoe UI", system-ui, sans-serif; }
+body { margin:0; background:var(--bg-main); overflow:hidden; }
+
+#titlebar { height:38px; display:flex; align-items:center; background:var(--bg-bar); border-bottom:1px solid var(--border);}
+#tabs { display:flex; flex:1; padding-left:8px; overflow-x:auto; white-space:nowrap; }
+
+.tab { flex:0 0 auto; min-width:140px; max-width:200px; height:30px; padding:6px 10px; margin-right:6px; background:var(--bg-tab); border-radius:8px 8px 0 0; cursor:pointer; user-select:none; display:flex; align-items:center; }
+.tab.active { background:var(--bg-tab-active); border:1px solid var(--border); border-bottom:none; }
+.tab-close { margin-left:auto; font-size:14px; opacity:0.6; cursor:pointer; }
+.tab-close:hover { opacity:1; }
+
+#newTabBtn { margin-right:10px; width:28px; height:28px; border:none; border-radius:50%; background:#e0e0e0; cursor:pointer; }
+
+#nav { height:42px; background:var(--bg-bar); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 12px; position:relative; }
+.nav-btn { width:30px; height:30px; margin-right:6px; border:none; border-radius:50%; background:#eaeaea; cursor:pointer; }
+#urlbar { flex:1; height:30px; border-radius:15px; border:1px solid var(--border); padding:0 14px; font-size:14px; }
+
+#view-container { width:100vw; height:calc(100vh-80px); }
+.webview { width:100%; height:100%; }
+
+#bookmarkBar { height:34px; background:var(--bg-bar); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 8px; gap:6px; overflow-x:auto; }
+.bookmark-btn { display:flex; align-items:center; gap:6px; padding:6px 10px; background:#eaeaea; border-radius:14px; cursor:pointer; }
+.bookmark-btn:hover { background:#ddd; }
+
+.settings-sidebar { position:fixed; top:0; right:-320px; width:320px; height:100vh; background:#fff; border-left:1px solid #ccc; box-shadow:-4px 0 10px rgba(0,0,0,0.15); transition:right 0.25s ease; display:flex; flex-direction:column; }
+.settings-sidebar.open { right:0; }
+.settings-header { height:48px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; border-bottom:1px solid #ddd; font-weight:600; }
+.settings-content { padding:12px; }
+.setting-item { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:14px; }
+
+.reset-btn { margin-top: 12px; padding: 8px 12px; background: #ff4d4f; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.reset-btn:hover { background: #e04444; }
+
+body.dark-mode { background-color: #1e1e1e; color: #f0f0f0; }
+body.dark-mode #bookmarkBar, body.dark-mode .tab, body.dark-mode #nav { background-color: rgba(40,40,40,0.85); border-color:#555; color:#f0f0f0; }
+body.dark-mode input, body.dark-mode select { background-color:#333; color:#f0f0f0; border-color:#555; }
+
+/* webview を親に合わせる */
+.webview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none;      /* タブ非アクティブ時は非表示 */
+}
+
+#view-container {
+  flex: 1;           /* 残りの高さをすべて使う */
+  display: flex;
+  position: relative;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--bg-main);
   overflow: hidden;
 }
 
-/* ===== タイトルバー ===== */
-#titlebar {
-  height: 38px;
-  display: flex;
-  align-items: center;
-  background: var(--bg-bar);
-  border-bottom: 1px solid var(--border);
-}
-
-#tabs {
-  display: flex;
-  flex: 1;
-  padding-left: 8px;
-}
-
-/* ===== タブ ===== */
-.tab {
-  display: flex;
-  align-items: center;
-  min-width: 140px;
-  max-width: 200px;
-  height: 30px;
-  padding: 6px 10px;
-  margin-right: 6px;
-  background: var(--bg-tab);
-  border-radius: 8px 8px 0 0;
-  font-size: 13px;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.18s cubic-bezier(.2,.8,.2,1),
-              background 0.15s ease;
-}
-
-.tab.active {
-  background: var(--bg-tab-active);
-  border: 1px solid var(--border);
-  border-bottom: none;
-}
-
-.tab.dragging {
-  opacity: 0.9;
-  z-index: 10;
-}
-
-.tab span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tab-close {
-  margin-left: auto;
-  font-size: 14px;
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-.tab-close:hover {
-  opacity: 1;
-}
-
-#newTabBtn {
-  margin-right: 10px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #e0e0e0;
-  cursor: pointer;
-}
-
-/* ===== ナビ ===== */
-#nav {
-  height: 42px;
-  background: var(--bg-bar);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-}
-
-.nav-btn {
-  width: 30px;
-  height: 30px;
-  margin-right: 6px;
-  border: none;
-  border-radius: 50%;
-  background: #eaeaea;
-  cursor: pointer;
-}
-
-#urlbar {
-  flex: 1;
-  height: 30px;
-  border-radius: 15px;
-  border: 1px solid var(--border);
-  padding: 0 14px;
-  font-size: 14px;
-}
-
-/* ===== 表示 ===== */
-#view-container {
-  width: 100vw;
-  height: calc(100vh - 80px);
-}
-
-.webview {
-  width: 100%;
-  height: 100%;
-}
-
-/* ===== 履歴 ===== */
-#historyPopup {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 420px;
-  max-height: 400px;
-  overflow-y: auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  z-index: 999;
-}
-
-.history-item {
-  padding: 10px 14px;
-  cursor: pointer;
-}
-
-.history-item:hover {
-  background: #f2f2f2;
-}
-
-.hidden {
-  display: none;
-}
-
-/* ===== 右クリック ===== */
-#context-menu {
-  position: fixed;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 9999;
-}
-
-.context-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.context-item:hover {
-  background: #f0f0f0;
-}
-
-#tabs {
-  display: flex;
-  align-items: center;
-  overflow-x: auto;       /* 横スクロール可能に */
-  white-space: nowrap;    /* タブを折り返さない */
-  -webkit-overflow-scrolling: touch; /* スマホでも滑らか */
-}
-
-.tab {
-  flex: 0 0 auto;         /* 横幅固定（縮めない） */
-  padding: 6px 12px;
-  margin-right: 2px;
-  border-radius: 4px 4px 0 0;
-  background: #eee;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.18s cubic-bezier(.4,0,.2,1);
-}
-
-.tab.active {
-  background: #fff;
-  border-bottom: 2px solid #4285f4;
-}
-
-.tab.dragging {
-  transition: none;
-  z-index: 10;
-}
-
-.tab.pinned {
-  width: 36px;
-  font-size: 0;
-}
-.tab.pinned span:first-child::after {
-  content: "📌";
-  font-size: 16px;
-}
-
-.tab.pinned {
-  width: 36px !important;
-  font-size: 0;
-  cursor: default;
-}
-.tab.pinned span:first-child::after {
-  content: "📌";
-  font-size: 16px;
-  display: inline-block;
-}
-.tab.pinned.dragging {
-  cursor: default;
+/* タイトルバー＋ナビ＋ブックマークバーを縦に並べる */
+#titlebar, #nav, #bookmarkBar {
+  flex-shrink: 0;
 }
