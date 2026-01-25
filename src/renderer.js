@@ -1,381 +1,368 @@
-const tabsEl = document.getElementById("tabs");
-const viewContainer = document.getElementById("view-container");
-const urlbar = document.getElementById("urlbar");
+document.addEventListener("DOMContentLoaded", () => {
 
-const backBtn = document.getElementById("backBtn");
-const forwardBtn = document.getElementById("forwardBtn");
-const homeBtn = document.getElementById("homeBtn");
-const historyBtn = document.getElementById("historyBtn");
-const newTabBtn = document.getElementById("newTabBtn");
-const historyPopup = document.getElementById("historyPopup");
+    /* ===== 要素取得 ===== */
+    const tabsEl = document.getElementById("tabs");
+    const viewContainer = document.getElementById("view-container");
+    const newTabBtn = document.getElementById("newTabBtn");
+    const urlbar = document.getElementById("urlbar");
+    const backBtn = document.getElementById("backBtn");
+    const forwardBtn = document.getElementById("forwardBtn");
+    const homeBtn = document.getElementById("homeBtn");
+    const bookmarkBar = document.getElementById("bookmarkBar");
+    const bookmarkBtn = document.getElementById("bookmarkBtn");
+    const historyBtn = document.getElementById("historyBtn");
+    const historyPopup = document.getElementById("historyPopup");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsSidebar = document.getElementById("settingsSidebar");
+    const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    const toggleBookmarkBar = document.getElementById("toggleBookmarkBar");
+    const searchEngineSelect = document.getElementById("searchEngine");
+    const bgUpload = document.getElementById("bgUpload");
+    const newTabUpload = document.getElementById("newTabUpload");
+    const resetBtn = document.getElementById("resetSettingsBtn");
 
-let tabs = [];
-let activeTabId = null;
-let historyList = JSON.parse(localStorage.getItem("history") || "[]");
+    let tabs = [];
+    let activeTabId = null;
+    let bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+    let historyList = JSON.parse(localStorage.getItem("history") || "[]");
 
-/* ===== NewTab HTML ===== */
-function newTabHTML() {
-  return `<!DOCTYPE html>
+    /* ===== ユーティリティ ===== */
+    const activeWebview = () => tabs.find(t=>t.id===activeTabId)?.webview;
+
+    /* ===== NewTab HTML ===== */
+    const DEFAULT_NEWTAB_HTML = `<!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"><title>New Tab</title>
+<head>
+<meta charset="UTF-8">
+<title>New Tab</title>
 <style>
-*{box-sizing:border-box;font-family:Segoe UI,system-ui}
-body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f5f5f5,#e9e9e9)}
-.clock{font-size:72px;font-weight:300}
-.date{font-size:14px;color:#666}
-input{width:420px;height:42px;margin-top:28px;border-radius:21px;border:1px solid #ccc;padding:0 18px;font-size:15px}
-</style></head>
+  * { box-sizing: border-box; font-family: "Segoe UI", system-ui, sans-serif; }
+  body { margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background:transparent; }
+  .container { text-align:center; }
+  .clock { font-size:72px; font-weight:300; color:#222; letter-spacing:2px; }
+  .date { margin-top:6px; font-size:14px; color:#666; }
+  .search-box { margin-top:32px; }
+  input { width:420px; height:42px; border-radius:21px; border:1px solid #ccc; padding:0 18px; font-size:15px; outline:none; background:#fff; }
+  input:focus { border-color:#999; }
+  .footer { margin-top:40px; font-size:12px; color:#aaa; }
+</style>
+</head>
 <body>
-<div style="text-align:center">
-<div id="clock" class="clock"></div>
-<div id="date" class="date"></div>
-<input id="search" placeholder="検索または URL を入力" autofocus>
-</div>
+  <div class="container">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="date" id="date"></div>
+    <div class="search-box">
+      <input id="search" placeholder="検索または URL を入力" autofocus />
+    </div>
+    <div class="footer">MCBrowser NewTab</div>
+  </div>
 <script>
-function u(){const n=new Date();clock.textContent=String(n.getHours()).padStart(2,'0')+":"+String(n.getMinutes()).padStart(2,'0')+":"+String(n.getSeconds()).padStart(2,'0');date.textContent=n.toLocaleDateString("ja-JP",{weekday:"short",year:"numeric",month:"long",day:"numeric"});}
-u();setInterval(u,1000);
-search.onkeydown=e=>{if(e.key!=="Enter")return;let v=e.target.value.trim();if(!v.startsWith("http"))v="https://www.google.com/search?q="+encodeURIComponent(v);location.href=v;}
-</script></body></html>`;
-}
-
-/* ===== タブ作成 ===== */
-function createTab(url = "newtab") {
-  const id = Date.now().toString();
-  const tabBtn = document.createElement("div");
-  tabBtn.className = "tab";
-  tabBtn.innerHTML = `<span>New Tab</span><span class="tab-close">×</span>`;
-  tabBtn.onclick = () => activateTab(id);
-  tabBtn.querySelector(".tab-close").onclick = e => { e.stopPropagation(); closeTab(id); };
-
-  const webview = document.createElement("webview");
-  webview.className = "webview";
-  webview.style.display = "none";
-  webview.src = url === "newtab" ? "data:text/html," + encodeURIComponent(newTabHTML()) : url;
-
-  webview.addEventListener("page-title-updated", e => { tabBtn.querySelector("span").textContent = e.title || "New Tab"; });
-  webview.addEventListener("did-navigate", e => { urlbar.value = e.url; addHistory(e.url, webview.getTitle()); });
-
-  tabsEl.appendChild(tabBtn);
-  viewContainer.appendChild(webview);
-  tabs.push({ id, tabBtn, webview });
-
-  activateTab(id);
-
-  initTabDrag(tabBtn);
-}
-
-/* ===== タブドラッグ Chrome級 ===== */
-/* ===== 磁石＋Chrome級タブドラッグ + 横スクロール ===== */
-function initTabDrag() {
-  let dragTab = null;
-  let startX = 0;
-  let currentX = 0;
-  let dragIndex = 0;
-  let animationFrame = null;
-
-  function onPointerMove(e) {
-    if (!dragTab) return;
-    currentX = e.clientX;
-    const dx = currentX - startX;
-    dragTab.style.transform = `translateX(${dx}px)`;
-
-    const rect = dragTab.getBoundingClientRect();
-    const containerRect = tabsEl.getBoundingClientRect();
-
-    // 自動横スクロール
-    const edgeThreshold = 50;
-    const scrollSpeed = 8;
-    if (rect.left < containerRect.left + edgeThreshold) {
-      tabsEl.scrollLeft -= scrollSpeed;
-    } else if (rect.right > containerRect.right - edgeThreshold) {
-      tabsEl.scrollLeft += scrollSpeed;
-    }
-
-    // タブ入れ替え
-    const index = tabs.findIndex(t => t.tabBtn === dragTab);
-    tabs.forEach((t, i) => {
-      if (t.tabBtn === dragTab) return;
-      const r = t.tabBtn.getBoundingClientRect();
-      const mid = r.left + r.width / 2;
-
-      if (dx > 0 && rect.right > mid && i > index) reorderTabs(index, i);
-      if (dx < 0 && rect.left < mid && i < index) reorderTabs(index, i);
-    });
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById("clock").textContent = h+":"+m+":"+s;
+    document.getElementById("date").textContent = now.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"});
   }
-
-  function onPointerUp(e) {
-    if (!dragTab) return;
-    dragTab.releasePointerCapture(e.pointerId);
-    dragTab.classList.remove("dragging");
-    dragTab.style.transform = "";
-    dragTab = null;
-    if (animationFrame) cancelAnimationFrame(animationFrame);
-  }
-
-  tabsEl.addEventListener("pointerdown", e => {
-    const tab = e.target.closest(".tab");
-    if (!tab || e.target.classList.contains("tab-close")) return;
-
-    dragTab = tab;
-    startX = e.clientX;
-    dragIndex = tabs.findIndex(t => t.tabBtn === dragTab);
-
-    dragTab.classList.add("dragging");
-    dragTab.setPointerCapture(e.pointerId);
-
-    function frame() {
-      onPointerMove(e);
-      animationFrame = requestAnimationFrame(frame);
+  updateClock();
+  setInterval(updateClock,1000);
+  document.getElementById("search").addEventListener("keydown", e=>{
+    if(e.key==="Enter"){
+      let v=e.target.value.trim();
+      if(!v) return;
+      if(!v.startsWith("http")) v="https://www.google.com/search?q="+encodeURIComponent(v);
+      location.href=v;
     }
-    frame();
   });
+</script>
+</body>
+</html>`;
 
-  document.addEventListener("pointermove", onPointerMove);
-  document.addEventListener("pointerup", onPointerUp);
+    const getNewTabHTML = () => localStorage.getItem("customNewTab") || DEFAULT_NEWTAB_HTML;
+
+    /* ===== タブ作成 ===== */
+    function createTab(url="newtab"){
+        const id=Date.now().toString();
+        const tabBtn=document.createElement("div");
+        tabBtn.className="tab";
+        tabBtn.innerHTML=`<span>New Tab</span><span class="tab-close">×</span>`;
+        tabsEl.appendChild(tabBtn);
+
+        const webview=document.createElement("webview");
+        webview.className="webview";
+        webview.src=url==="newtab"?"data:text/html,"+encodeURIComponent(getNewTabHTML()):url;
+        webview.style.display="none";
+        viewContainer.appendChild(webview);
+
+        tabBtn.onclick=()=>activateTab(id);
+        tabBtn.querySelector(".tab-close").onclick=e=>{ e.stopPropagation(); closeTab(id); };
+
+        webview.addEventListener("page-title-updated", e=>{
+            tabBtn.querySelector("span").textContent = e.title || "New Tab";
+        });
+        webview.addEventListener("did-navigate", e=>{
+            urlbar.value = e.url;
+            addHistory(e.url, webview.getTitle());
+            saveTabs();
+        });
+
+        tabs.push({id, tabBtn, webview});
+        activateTab(id);
+    }
+
+    /* ===== タブアクティブ化 ===== */
+    function activateTab(id){
+        tabs.forEach(t=>{ t.tabBtn.classList.remove("active"); t.webview.style.display="none"; });
+        const t=tabs.find(t=>t.id===id);
+        if(!t) return;
+        t.tabBtn.classList.add("active");
+        t.webview.style.display="flex";
+        activeTabId=id;
+        scrollActiveTabIntoView(t.tabBtn);
+    }
+
+    /* ===== タブ閉じる ===== */
+    function closeTab(id){
+        const i=tabs.findIndex(t=>t.id===id);
+        if(i===-1) return;
+        tabs[i].tabBtn.remove();
+        tabs[i].webview.remove();
+        tabs.splice(i,1);
+        if(!tabs.length) createTab();
+        else activateTab(tabs[Math.max(0,i-1)].id);
+    }
+
+    /* ===== URL入力・ナビ ===== */
+    urlbar.onkeydown=e=>{
+        if(e.key!=="Enter") return;
+        let v=urlbar.value.trim();
+        if(!v.startsWith("http")) v=buildSearchUrl(encodeURIComponent(v));
+        activeWebview().src=v;
+    };
+    backBtn.onclick=()=>activeWebview()?.goBack();
+    forwardBtn.onclick=()=>activeWebview()?.goForward();
+    homeBtn.onclick=()=>{ activeWebview().src="data:text/html,"+encodeURIComponent(getNewTabHTML()); saveTabs(); };
+
+    /* ===== 履歴 ===== */
+    function addHistory(url,title){
+        if(url.startsWith("data:")) return;
+        historyList.unshift({title,url});
+        historyList=historyList.slice(0,100);
+        localStorage.setItem("history",JSON.stringify(historyList));
+    }
+    historyBtn.onclick=()=>{
+        historyPopup.innerHTML="";
+        historyList.forEach(h=>{
+            const d=document.createElement("div");
+            d.textContent=h.title;
+            d.onclick=()=>{ activeWebview().src=h.url; historyPopup.classList.add("hidden"); };
+            historyPopup.appendChild(d);
+        });
+        historyPopup.classList.toggle("hidden");
+    };
+
+    /* ===== タブスクロール ===== */
+    function scrollActiveTabIntoView(tabBtn){
+        const rect=tabBtn.getBoundingClientRect();
+        const container=tabsEl.getBoundingClientRect();
+        const scrollLeft=tabsEl.scrollLeft;
+        if(rect.left<container.left) tabsEl.scrollTo({left:scrollLeft+rect.left-container.left-10,behavior:"smooth"});
+        else if(rect.right>container.right) tabsEl.scrollTo({left:scrollLeft+(rect.right-container.right)+10,behavior:"smooth"});
+    }
+
+    /* ===== タブドラッグ（完全安全版） ===== */
+function initTabDrag() {
+    let dragTab = null;
+    let startX = 0;
+    let placeholder = null;
+    let isDragging = false;
+    let longPressTimer = null;
+    const LONG_PRESS_DELAY = 200; // 長押し判定 (ms)
+
+    tabsEl.addEventListener("pointerdown", e => {
+        const tab = e.target.closest(".tab");
+        if (!tab || e.target.classList.contains("tab-close")) return;
+
+        dragTab = tab;
+        startX = e.clientX;
+        isDragging = false;
+
+        longPressTimer = setTimeout(() => {
+            isDragging = true;
+
+            // placeholder 作成
+            placeholder = document.createElement("div");
+            placeholder.style.width = dragTab.offsetWidth + "px";
+            placeholder.style.height = dragTab.offsetHeight + "px";
+            tabsEl.insertBefore(placeholder, dragTab.nextSibling);
+
+            dragTab.classList.add("dragging");
+            dragTab.style.pointerEvents = "none";
+            dragTab.setPointerCapture(e.pointerId);
+        }, LONG_PRESS_DELAY);
+    });
+
+    document.addEventListener("pointermove", e => {
+        if (!dragTab) return;
+
+        if (!isDragging) return; // 長押し前は何もしない
+
+        // transform だけで軽く移動
+        const dx = e.clientX - startX;
+        dragTab.style.transform = `translateX(${dx}px)`;
+
+        // placeholder 入れ替え
+        const rect = dragTab.getBoundingClientRect();
+        Array.from(tabsEl.children).forEach(t => {
+            if (t === placeholder || t === dragTab) return;
+            const r = t.getBoundingClientRect();
+            const mid = r.left + r.width / 2;
+            if (dx > 0 && rect.right > mid) tabsEl.insertBefore(placeholder, t.nextSibling);
+            if (dx < 0 && rect.left < mid) tabsEl.insertBefore(placeholder, t);
+        });
+    });
+
+    document.addEventListener("pointerup", e => {
+        clearTimeout(longPressTimer);
+
+        if (!dragTab) return;
+
+        if (!isDragging) {
+            // 長押しじゃなければクリックとして扱う
+            dragTab.click();
+        } else {
+            // ドラッグ終了 → placeholder の位置に移動
+            tabsEl.insertBefore(dragTab, placeholder);
+            dragTab.style.transform = "";
+            dragTab.style.pointerEvents = "";
+            dragTab.classList.remove("dragging");
+            placeholder.remove();
+            dragTab.releasePointerCapture(e.pointerId);
+        }
+
+        dragTab = null;
+        placeholder = null;
+        isDragging = false;
+    });
 }
+initTabDrag();
+
+    
+    /* ===== ブックマーク ===== */
+    function renderBookmarks(){
+        bookmarkBar.innerHTML="";
+        bookmarks.forEach((b,i)=>{
+            const btn=document.createElement("div");
+            btn.className="bookmark-btn";
+            const img=document.createElement("img");
+            try{ img.src=`https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=32`; } catch{ img.src=""; }
+            img.width=16; img.height=16;
+            const span=document.createElement("span");
+            span.textContent=b.title;
+            btn.appendChild(img); btn.appendChild(span);
+            btn.onclick=()=>activeWebview().src=b.url;
+            btn.oncontextmenu=e=>{ e.preventDefault(); bookmarks.splice(i,1); localStorage.setItem("bookmarks",JSON.stringify(bookmarks)); renderBookmarks(); };
+            bookmarkBar.appendChild(btn);
+        });
+    }
+    renderBookmarks();
+    bookmarkBtn.onclick = ()=>{
+        const wv = activeWebview(); if(!wv||wv.src.startsWith("data:")) return;
+        const url = wv.src;
+        if(bookmarks.some(b=>b.url===url)) return;
+        bookmarks.unshift({title: wv.getTitle()||url, url});
+        localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+        renderBookmarks();
+    };
+
+    /* ===== 設定サイドバー ===== */
+    settingsBtn.onclick=e=>{ e.stopPropagation(); settingsSidebar.classList.add("open"); };
+    closeSettingsBtn.onclick = ()=>settingsSidebar.classList.remove("open");
+    settingsSidebar.addEventListener("click", e=>e.stopPropagation());
+    document.addEventListener("click", e=>{
+        if(settingsSidebar.classList.contains("open") && !settingsSidebar.contains(e.target) && e.target!==settingsBtn)
+            settingsSidebar.classList.remove("open");
+    });
+
+    /* ===== 設定保存・復元 ===== */
+    searchEngineSelect.value = localStorage.getItem("searchEngine") || "google";
+    searchEngineSelect.onchange = ()=>localStorage.setItem("searchEngine", searchEngineSelect.value);
+
+    toggleBookmarkBar.checked = localStorage.getItem("showBookmarkBar")!=="false";
+    bookmarkBar.style.display = toggleBookmarkBar.checked?"flex":"none";
+    toggleBookmarkBar.onchange = ()=>{
+        const show = toggleBookmarkBar.checked;
+        bookmarkBar.style.display = show?"flex":"none";
+        localStorage.setItem("showBookmarkBar", show);
+    };
+
+    const savedBg = localStorage.getItem("bgImage");
+    if(savedBg) document.body.style.backgroundImage=`url(${savedBg})`;
+    bgUpload.onchange=e=>{
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload=()=>{ document.body.style.backgroundImage=`url(${reader.result})`; localStorage.setItem("bgImage", reader.result); };
+        reader.readAsDataURL(file);
+    };
+    newTabUpload.onchange=e=>{
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload=()=>localStorage.setItem("customNewTab", reader.result);
+        reader.readAsText(file);
+    };
+
+    function buildSearchUrl(q){
+        const engine = localStorage.getItem("searchEngine") || "google";
+        if(engine==="bing") return "https://www.bing.com/search?q="+q;
+        if(engine==="duck") return "https://duckduckgo.com/?q="+q;
+        return "https://www.google.com/search?q="+q;
+    }
+
+    /* ===== 起動時タブ復元 ===== */
+    const savedTabs = JSON.parse(localStorage.getItem("savedTabs") || "null");
+    if(savedTabs && savedTabs.tabs.length){
+        savedTabs.tabs.forEach(url=>createTab(url));
+        activateTab(tabs[savedTabs.active]?.id||tabs[0].id);
+    } else createTab();
+
+    /* ===== タブ保存 ===== */
+    function saveTabs(){
+        const data = { tabs: tabs.map(t=>t.webview.src), active: tabs.findIndex(t=>t.id===activeTabId) };
+        localStorage.setItem("savedTabs", JSON.stringify(data));
+    }
+
+const { ipcRenderer } = require('electron');
+
+resetBtn.onclick = () => {
+    if (!confirm("本当に設定をリセットしますか？")) return;
+
+    localStorage.removeItem("bgImage");
+    localStorage.removeItem("theme");
+    localStorage.removeItem("searchEngine");
+    localStorage.removeItem("savedTabs");
+    localStorage.removeItem("customNewTab");
+
+    document.body.style.backgroundImage = "";
+    document.body.classList.remove("dark-mode");
+
+    toggleBookmarkBar.checked = true;
+    bookmarkBar.style.display = "flex";
+
+    // タブを閉じずにそのまま閉じる
+    ipcRenderer.send('close-app');
+};
 
 
-/* ===== 並び替え ===== */
-function reorderTabs(from, to) {
-  if (from === to) return;
-  const moved = tabs.splice(from, 1)[0];
-  tabs.splice(to, 0, moved);
-  tabsEl.insertBefore(moved.tabBtn, tabsEl.children[to]);
-  viewContainer.insertBefore(moved.webview, viewContainer.children[to]);
-}
+    /* ===== 新しいタブボタン ===== */
+    newTabBtn.onclick = ()=>createTab();
 
-/* ===== タブ制御 ===== */
-function activateTab(id) {
-  tabs.forEach(t => { t.tabBtn.classList.remove("active"); t.webview.style.display = "none"; });
-  const t = tabs.find(t => t.id === id);
-  if (!t) return;
-  t.tabBtn.classList.add("active");
-  t.webview.style.display = "flex";
-  activeTabId = id;
-  scrollActiveTabIntoView(t.tabBtn);
-}
-
-function closeTab(id) {
-  const i = tabs.findIndex(t => t.id === id);
-  if (i === -1) return;
-  tabs[i].tabBtn.remove();
-  tabs[i].webview.remove();
-  tabs.splice(i, 1);
-  if (!tabs.length) createTab();
-  else activateTab(tabs[Math.max(0, i - 1)].id);
-}
-
-/* ===== ナビ ===== */
-function activeWebview() { return tabs.find(t => t.id === activeTabId)?.webview; }
-backBtn.onclick = () => activeWebview()?.goBack();
-forwardBtn.onclick = () => activeWebview()?.goForward();
-homeBtn.onclick = () => activeWebview().src = "data:text/html," + encodeURIComponent(newTabHTML());
-urlbar.onkeydown = e => { if (e.key!=="Enter") return; let v=urlbar.value.trim(); if(!v.startsWith("http")) v="https://www.google.com/search?q="+encodeURIComponent(v); activeWebview().src=v; };
-
-/* ===== 履歴 ===== */
-function addHistory(url,title){if(url.startsWith("data:"))return;historyList.unshift({title,url});historyList=historyList.slice(0,100);localStorage.setItem("history",JSON.stringify(historyList));}
-historyBtn.onclick=()=>{historyPopup.innerHTML="";historyList.forEach(h=>{const d=document.createElement("div");d.className="history-item";d.textContent=h.title;d.onclick=()=>{activeWebview().src=h.url;historyPopup.classList.add("hidden");};historyPopup.appendChild(d);});historyPopup.classList.toggle("hidden");};
-
-/* ===== 起動 ===== */
-newTabBtn.onclick = () => createTab();
-createTab();
-
-/* ===== アクティブタブを常に表示 ===== */
-function scrollActiveTabIntoView(tabBtn){
-  const rect = tabBtn.getBoundingClientRect();
-  const container = tabsEl.getBoundingClientRect();
-  const scrollLeft = tabsEl.scrollLeft;
-
-  if(rect.left < container.left){
-    tabsEl.scrollTo({left: scrollLeft + rect.left - container.left -10, behavior:"smooth"});
-  } else if(rect.right > container.right){
-    tabsEl.scrollTo({left: scrollLeft + (rect.right - container.right)+10, behavior:"smooth"});
-  }
-}
-
-/* ===== 右クリックメニュー共通 ===== */
+// 右クリックメニュー共通
 const contextMenu = document.createElement("div");
-contextMenu.id = "contextMenu";
-contextMenu.style.position = "fixed";
-contextMenu.style.zIndex = "9999";
-contextMenu.style.background = "#fff";
-contextMenu.style.border = "1px solid #ccc";
-contextMenu.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
-contextMenu.style.display = "none";
-contextMenu.style.minWidth = "160px";
-contextMenu.style.fontFamily = "Segoe UI, system-ui, sans-serif";
+contextMenu.style.cssText = "position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;display:none;min-width:160px;";
 document.body.appendChild(contextMenu);
 
-document.addEventListener("click", () => {
-  contextMenu.style.display = "none";
-});
-
-/* ===== タブバー右クリック ===== */
-tabsEl.addEventListener("contextmenu", e => {
-  e.preventDefault();
-  contextMenu.innerHTML = "";
-
-  const openTab = document.createElement("div");
-  openTab.textContent = "新しいタブを開く";
-  openTab.style.padding = "8px";
-  openTab.style.cursor = "pointer";
-  openTab.onmouseenter = () => openTab.style.background="#eee";
-  openTab.onmouseleave = () => openTab.style.background="#fff";
-  openTab.onclick = () => { createTab(); contextMenu.style.display="none"; };
-
-  const closeAll = document.createElement("div");
-  closeAll.textContent = "すべてのタブを閉じる";
-  closeAll.style.padding = "8px";
-  closeAll.style.cursor = "pointer";
-  closeAll.onmouseenter = () => closeAll.style.background="#eee";
-  closeAll.onmouseleave = () => closeAll.style.background="#fff";
-  closeAll.onclick = () => {
-    while(tabs.length) closeTab(tabs[0].id);
-    contextMenu.style.display="none";
-  };
-
-  contextMenu.appendChild(openTab);
-  contextMenu.appendChild(closeAll);
-
-  contextMenu.style.left = e.pageX + "px";
-  contextMenu.style.top = e.pageY + "px";
-  contextMenu.style.display = "block";
-});
-
-/* ===== URLバー右クリック ===== */
-urlbar.addEventListener("contextmenu", e => {
-  e.preventDefault();
-  contextMenu.innerHTML = "";
-
-  const copyItem = document.createElement("div");
-  copyItem.textContent = "コピー";
-  copyItem.style.padding = "8px";
-  copyItem.style.cursor = "pointer";
-  copyItem.onmouseenter = () => copyItem.style.background="#eee";
-  copyItem.onmouseleave = () => copyItem.style.background="#fff";
-  copyItem.onclick = () => { navigator.clipboard.writeText(urlbar.value); contextMenu.style.display="none"; };
-
-  const pasteItem = document.createElement("div");
-  pasteItem.textContent = "貼り付け";
-  pasteItem.style.padding = "8px";
-  pasteItem.style.cursor = "pointer";
-  pasteItem.onmouseenter = () => pasteItem.style.background="#eee";
-  pasteItem.onmouseleave = () => pasteItem.style.background="#fff";
-  pasteItem.onclick = async () => {
-    const text = await navigator.clipboard.readText();
-    urlbar.value = text;
-    contextMenu.style.display="none";
-  };
-
-  const searchItem = document.createElement("div");
-  searchItem.textContent = "検索";
-  searchItem.style.padding = "8px";
-  searchItem.style.cursor = "pointer";
-  searchItem.onmouseenter = () => searchItem.style.background="#eee";
-  searchItem.onmouseleave = () => searchItem.style.background="#fff";
-  searchItem.onclick = () => {
-    let v = urlbar.value.trim();
-    if(!v.startsWith("http")) v="https://www.google.com/search?q="+encodeURIComponent(v);
-    activeWebview().src = v;
-    contextMenu.style.display="none";
-  };
-
-  contextMenu.appendChild(copyItem);
-  contextMenu.appendChild(pasteItem);
-  contextMenu.appendChild(searchItem);
-
-  contextMenu.style.left = e.pageX + "px";
-  contextMenu.style.top = e.pageY + "px";
-  contextMenu.style.display = "block";
-});
-
-/* ===== タブバー右クリック（個別タブ対応） ===== */
-tabsEl.addEventListener("contextmenu", e => {
-  e.preventDefault();
-  contextMenu.innerHTML = "";
-
-  const tab = e.target.closest(".tab");
-  if (!tab) return;
-
-  const tabObj = tabs.find(t => t.tabBtn === tab);
-
-  // 「新しいタブを開く」
-  const openTab = document.createElement("div");
-  openTab.textContent = "新しいタブを開く";
-  openTab.style.padding = "8px";
-  openTab.style.cursor = "pointer";
-  openTab.onmouseenter = () => openTab.style.background = "#eee";
-  openTab.onmouseleave = () => openTab.style.background = "#fff";
-  openTab.onclick = () => { createTab(); contextMenu.style.display = "none"; };
-
-  // 「このタブを閉じる」
-  const closeTabItem = document.createElement("div");
-  closeTabItem.textContent = "このタブを閉じる";
-  closeTabItem.style.padding = "8px";
-  closeTabItem.style.cursor = "pointer";
-  closeTabItem.onmouseenter = () => closeTabItem.style.background = "#eee";
-  closeTabItem.onmouseleave = () => closeTabItem.style.background = "#fff";
-  closeTabItem.onclick = () => { closeTab(tabObj.id); contextMenu.style.display = "none"; };
-
-  // 「タブを複製」
-  const duplicateTab = document.createElement("div");
-  duplicateTab.textContent = "タブを複製";
-  duplicateTab.style.padding = "8px";
-  duplicateTab.style.cursor = "pointer";
-  duplicateTab.onmouseenter = () => duplicateTab.style.background = "#eee";
-  duplicateTab.onmouseleave = () => duplicateTab.style.background = "#fff";
-  duplicateTab.onclick = () => { createTab(tabObj.webview.src); contextMenu.style.display = "none"; };
-
-  // 「すべてのタブを閉じる」
-  const closeAll = document.createElement("div");
-  closeAll.textContent = "すべてのタブを閉じる";
-  closeAll.style.padding = "8px";
-  closeAll.style.cursor = "pointer";
-  closeAll.onmouseenter = () => closeAll.style.background = "#eee";
-  closeAll.onmouseleave = () => closeAll.style.background = "#fff";
-  closeAll.onclick = () => {
-    while(tabs.length) closeTab(tabs[0].id);
-    contextMenu.style.display = "none";
-  };
-
-  contextMenu.appendChild(openTab);
-  contextMenu.appendChild(closeTabItem);
-  contextMenu.appendChild(duplicateTab);
-  contextMenu.appendChild(closeAll);
-
-  contextMenu.style.left = e.pageX + "px";
-  contextMenu.style.top = e.pageY + "px";
-  contextMenu.style.display = "block";
-});
-
-/* ===== closeTab 修正（タブが0になったらアプリ終了） ===== */
-function closeTab(id) {
-  const i = tabs.findIndex(t => t.id === id);
-  if (i === -1) return;
-
-  tabs[i].tabBtn.remove();
-  tabs[i].webview.remove();
-  tabs.splice(i, 1);
-
-  if (!tabs.length) {
-    // すべて閉じたらアプリ終了
-    window.close(); // Electron環境ならウィンドウ閉じる
-    return;
-  }
-
-  activateTab(tabs[Math.max(0, i - 1)].id);
-}
-
-/* ===== タブバー右クリックメニュー（Chrome風拡張版） ===== */
-tabsEl.addEventListener("contextmenu", e => {
-  e.preventDefault();
-  contextMenu.innerHTML = "";
-
-  const tab = e.target.closest(".tab");
-  if (!tab) return;
-  const tabObj = tabs.find(t => t.tabBtn === tab);
-
-  function createMenuItem(label, onClick) {
+function createMenuItem(label, onClick) {
     const item = document.createElement("div");
     item.textContent = label;
     item.style.padding = "8px";
@@ -384,95 +371,49 @@ tabsEl.addEventListener("contextmenu", e => {
     item.onmouseleave = () => item.style.background = "#fff";
     item.onclick = () => { onClick(); contextMenu.style.display = "none"; };
     return item;
-  }
-
-  contextMenu.appendChild(createMenuItem("新しいタブを開く", () => createTab()));
-  contextMenu.appendChild(createMenuItem("このタブを閉じる", () => closeTab(tabObj.id)));
-  contextMenu.appendChild(createMenuItem("タブを複製", () => createTab(tabObj.webview.src)));
-  contextMenu.appendChild(createMenuItem("左端に移動", () => {
-    reorderTabs(tabs.findIndex(t => t.tabBtn===tabObj.tabBtn), 0);
-  }));
-  contextMenu.appendChild(createMenuItem("右端に移動", () => {
-    reorderTabs(tabs.findIndex(t => t.tabBtn===tabObj.tabBtn), tabs.length-1);
-  }));
-  contextMenu.appendChild(createMenuItem("ピン留め/解除", () => {
-    tabObj.tabBtn.classList.toggle("pinned");
-    // ピン留めなら左端へ移動
-    if(tabObj.tabBtn.classList.contains("pinned")) reorderTabs(tabs.findIndex(t => t.tabBtn===tabObj.tabBtn), 0);
-  }));
-  contextMenu.appendChild(createMenuItem("すべてのタブを閉じる", () => {
-    while(tabs.length) closeTab(tabs[0].id);
-  }));
-
-  contextMenu.style.left = e.pageX + "px";
-  contextMenu.style.top = e.pageY + "px";
-  contextMenu.style.display = "block";
-});
-
-function initTabDrag() {
-let dragTab=null,startX=0,placeholder=null;
-tabsEl.addEventListener("pointerdown", e=>{
-  const tab = e.target.closest(".tab");
-  if(!tab || e.target.classList.contains("tab-close")) return;
-  dragTab=tab; startX=e.clientX;
-  placeholder=document.createElement("div"); placeholder.style.width=dragTab.offsetWidth+"px"; placeholder.style.height=dragTab.offsetHeight+"px";
-  tabsEl.insertBefore(placeholder,dragTab.nextSibling);
-  dragTab.classList.add("dragging"); dragTab.setPointerCapture(e.pointerId);
-});
-
-document.addEventListener("pointermove", e=>{
-  if(!dragTab) return;
-  const dx=e.clientX-startX; dragTab.style.transform=`translateX(${dx}px)`;
-  const rect=dragTab.getBoundingClientRect();
-  Array.from(tabsEl.children).forEach(t=>{
-    if(t===placeholder || t===dragTab) return;
-    const r=t.getBoundingClientRect(),mid=r.left+r.width/2;
-    if(dx>0 && rect.right>mid) tabsEl.insertBefore(placeholder,t.nextSibling);
-    if(dx<0 && rect.left<mid) tabsEl.insertBefore(placeholder,t);
-  });
-});
-
-document.addEventListener("pointerup", e=>{
-  if(!dragTab) return;
-  tabsEl.insertBefore(dragTab,placeholder);
-  dragTab.style.transform=""; dragTab.classList.remove("dragging"); placeholder.remove();
-  dragTab.releasePointerCapture(e.pointerId);
-  dragTab=null;
-});
 }
 
+// 右クリック全体イベント
+document.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    contextMenu.innerHTML = "";
 
-// タブ右クリックメニューに「タブをグループ化」を追加
-tabsEl.addEventListener("contextmenu", e => {
-  const tab = e.target.closest(".tab");
-  if (!tab) return;
-  const tabObj = tabs.find(t => t.tabBtn === tab);
+    const tab = e.target.closest(".tab");
+    const bookmark = e.target.closest(".bookmark-btn");
 
-  const groupItem = document.createElement("div");
-  groupItem.textContent = "タブをグループ化";
-  groupItem.style.padding = "8px";
-  groupItem.style.cursor = "pointer";
-  groupItem.onmouseenter = () => groupItem.style.background = "#eee";
-  groupItem.onmouseleave = () => groupItem.style.background = "#fff";
-  groupItem.onclick = () => {
-    tabObj.tabBtn.classList.toggle("grouped");
-    contextMenu.style.display = "none";
-  };
+    if(tab){
+        // タブ用メニュー
+        const t = tabs.find(t=>t.tabBtn===tab);
+        contextMenu.appendChild(createMenuItem("新しいタブを開く", ()=>createTab()));
+        contextMenu.appendChild(createMenuItem("タブを閉じる", ()=>closeTab(t.id)));
+        contextMenu.appendChild(createMenuItem("タブを複製", ()=>createTab(t.webview.src)));
+    } else if(bookmark){
+        // ブックマーク用メニュー
+        const index = Array.from(bookmarkBar.children).indexOf(bookmark);
+        contextMenu.appendChild(createMenuItem("開く", ()=>activeWebview().src=bookmarks[index].url));
+        contextMenu.appendChild(createMenuItem("削除", ()=>{ 
+            bookmarks.splice(index, 1); 
+            localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+            renderBookmarks();
+        }));
+    } else if(e.target === urlbar){
+        // URLバー用メニュー
+        contextMenu.appendChild(createMenuItem("コピー", ()=>navigator.clipboard.writeText(urlbar.value)));
+        contextMenu.appendChild(createMenuItem("貼り付け", async ()=>{ 
+            const text = await navigator.clipboard.readText();
+            urlbar.value = text; 
+        }));
+        contextMenu.appendChild(createMenuItem("リロード", ()=>activeWebview()?.reload()));
+    } else {
+        // それ以外 → タブなし全体用メニュー
+        contextMenu.appendChild(createMenuItem("新しいタブを開く", ()=>createTab()));
+        contextMenu.appendChild(createMenuItem("すべてのタブを閉じる", ()=>{while(tabs.length) closeTab(tabs[0].id);}));
+    }
 
-  contextMenu.appendChild(groupItem);
+    contextMenu.style.left = e.pageX + "px";
+    contextMenu.style.top = e.pageY + "px";
+    contextMenu.style.display = "block";
 });
 
-const duplicateAllBtn = document.getElementById("duplicateAllBtn");
-duplicateAllBtn?.addEventListener("click", () => {
-  tabs.forEach(t => createTab(t.webview.src));
-});
-
-function saveBookmark(tabObj) {
-  const bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
-  bookmarks.push({title: tabObj.webview.getTitle(), url: tabObj.webview.src});
-  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-}
-
-// タブ右クリックに追加
-contextMenu.appendChild(createMenuItem("ブックマークに追加", () => saveBookmark(tabObj)));
-
+// クリックでメニューを閉じる
+document.addEventListener("click", ()=>contextMenu.style.display="none")});
