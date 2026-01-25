@@ -20,13 +20,59 @@
   <button class="nav-btn" id="homeBtn">🏠</button>
   <button class="nav-btn" id="historyBtn">☰</button>
   <input id="urlbar" placeholder="検索または URL を入力">
+  <div id="searchSuggestions" class="hidden"></div>
+  <button class="nav-btn" id="bookmarkBtn">⭐</button>
+  <button id="settingsBtn">⚙</button>
 </div>
+
+<!-- ===== ブックマークバー ===== -->
+<div id="bookmarkBar"></div>
 
 <!-- ===== 履歴 ===== -->
 <div id="historyPopup" class="hidden"></div>
 
 <!-- ===== 表示領域 ===== -->
 <div id="view-container"></div>
+
+<!-- ===== 設定サイドバー ===== -->
+<div id="settingsSidebar" class="settings-sidebar">
+  <div class="settings-header">
+    <span>⚙ 設定</span>
+    <button id="closeSettingsBtn">✕</button>
+  </div>
+
+  <div class="settings-content">
+    <label class="setting-item">
+      <input type="checkbox" id="toggleBookmarkBar" checked>
+      ブックマークバーを表示
+    </label>
+
+    <label class="setting-item">
+      <input type="checkbox" id="toggleTabScroll" checked>
+      タブの横スクロールを有効
+    </label>
+
+    <label class="setting-item">
+      検索エンジン
+      <select id="searchEngine">
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+        <option value="duck">DuckDuckGo</option>
+      </select>
+    </label>
+
+    <label class="setting-item">
+      背景画像
+      <input type="file" id="bgUpload" accept="image/*">
+    </label>
+
+    <label class="setting-item">
+      NewTab HTML
+      <input type="file" id="newTabUpload" accept=".html">
+    </label>
+    <button id="resetSettingsBtn" class="reset-btn">設定をリセット</button>
+  </div>
+</div>
 
 <script src="renderer.js"></script>
 </body>
