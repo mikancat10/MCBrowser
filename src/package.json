@@ -1,6 +1,6 @@
 {
   "name": "mcbrowser",
-  "version": "1.0.0",
+  "version": "7.0.0",
   "description": "MCBrowser",
   "main": "main.js",
   "scripts": {
@@ -11,16 +11,30 @@
     "electron": "^30.0.0",
     "electron-builder": "^26.4.0"
   },
+  "dependencies": {
+    "axios": "^1.13.4",
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.7.3"
+  },
   "build": {
     "appId": "com.mikan.mcbrowser",
     "productName": "MCBrowser",
     "directories": {
       "output": "dist"
     },
-    "files": ["**/*"],
+    "files": [
+      "**/*"
+    ],
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "mikancat10",
+        "repo": "MCBrowser"
+      }
+    ]
   }
 }
