@@ -72,3 +72,12 @@ body {
 #titlebar, #nav, #bookmarkBar {
   flex-shrink: 0;
 }
+
+.nav-btn.small {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
