@@ -46,17 +46,23 @@ body.dark-mode input, body.dark-mode select { background-color:#333; color:#f0f0
 
 /* webview を親に合わせる */
 .webview {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: none;      /* タブ非アクティブ時は非表示 */
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+  display:none;
+  z-index:0;
 }
+
 
 #view-container {
   flex: 1;           /* 残りの高さをすべて使う */
   display: flex;
   position: relative;
   overflow: hidden;
+    position:relative;
+  z-index:0;
 }
 
 body {
@@ -80,4 +86,119 @@ body {
   margin-right: 10px;
   border-radius: 50%;
   background: #e0e0e0;
+}
+
+/* ===== 履歴ポップアップ ===== */
+#historyPopup {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  width: 260px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 999;
+  padding: 6px 0;
+}
+
+.history-item {
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #f0f0f0;
+}
+
+.hidden { display:none; }
+
+/* ===== カスタム右クリックメニュー ===== */
+.context-menu {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  padding: 6px 0;
+  min-width: 180px;
+  z-index: 9999;
+  font-size: 13px;
+}
+
+.context-menu-item {
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background: #f2f2f2;
+}
+
+.context-menu-separator {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 4px 0;
+}
+
+/* ===== よくアクセスするサイト ===== */
+#topSites{
+  margin-top:34px;
+  width:560px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  justify-content:center;
+}
+
+.site-tile{
+  height:90px;
+  border-radius:14px;
+  background:#ffffff;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+
+.site-tile:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 18px rgba(0,0,0,.15);
+}
+
+.site-icon{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#e8eaed;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.site-title{
+  font-size:12px;
+  max-width:110px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#333;
+}
+
+.site-icon{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:contain;
+  background:#fff;
+  padding:4px;
+  margin-bottom:6px;
 }
