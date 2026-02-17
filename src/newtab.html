@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>New Tab</title>
+<style>
+  * { box-sizing:border-box; font-family:"Segoe UI",system-ui,sans-serif; }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container { text-align:center; }
+
+  .clock {
+    font-size:72px;
+    font-weight:300;
+    color:#222;
+    letter-spacing:2px;
+  }
+
+  .date {
+    margin-top:6px;
+    font-size:14px;
+    color:#666;
+  }
+
+  .search-box { margin-top:32px; }
+
+  input {
+    width:420px;
+    height:42px;
+    border-radius:21px;
+    border:1px solid #ccc;
+    padding:0 18px;
+    font-size:15px;
+    outline:none;
+    background:#fff;
+  }
+
+  input:focus { border-color:#999; }
+
+  .footer {
+    margin-top:40px;
+    font-size:12px;
+    color:#aaa;
+  }
+  /* ===== 9点リーダー ===== */
+#appLauncher{
+  position:fixed;
+  top:14px;
+  right:18px;
+  z-index:1000;
+}
+
+/* 9ドット */
+#appBtn{
+  width:28px;
+  height:28px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:3px;
+  cursor:pointer;
+}
+
+#appBtn span{
+  width:6px;
+  height:6px;
+  background:#555;
+  border-radius:50%;
+  display:block;
+}
+
+/* メニュー */
+#appMenu{
+  position:absolute;
+  right:0;
+  top:38px;
+  width:210px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+  padding:10px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  outline:none;
+
+}
+
+.appItem{
+  text-align:center;
+  padding:10px 6px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:12px;
+  color:#222;
+}
+
+.appItem:hover{
+  background:#f1f3f4;
+}
+
+.icon{
+  width:36px;
+  height:36px;
+  margin:0 auto 6px;
+  border-radius:50%;
+  background:#e8eaed;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+/* ===== webviewより前に出す（最重要） ===== */
+#appLauncher{
+  position:fixed;
+  top:14px;
+  right:18px;
+  z-index:2147483647;
+}
+
+#appMenu{
+  z-index:2147483647;
+  pointer-events:auto;
+}
+
+#engineSwitch{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+#engineSwitch button{
+  border:none;
+  background:#f1f3f4;
+  padding:6px 14px;
+  border-radius:18px;
+  cursor:pointer;
+  font-size:13px;
+  transition:.15s;
+}
+
+#engineSwitch button.active{
+  background:#d2e3fc;
+  font-weight:600;
+}
+
+#engineSwitch button:hover{
+  background:#e2e6ea;
+}
+
+.hidden{ display:none; }
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="date" id="date"></div>
+    <div id="engineSwitch">
+  <button data-engine="google">Google</button>
+  <button data-engine="bing">Bing</button>
+  <button data-engine="duck">DuckDuckGo</button>
+</div>
+
+    <div class="search-box">
+      <input id="search" placeholder="検索または URL を入力" autofocus />
+    </div>
+    <div id="topSites"></div>
+
+    <div class="footer">MCBrowser NewTab</div>
+  </div>
+
+<script>
+let engine = localStorage.getItem("searchEngine") || "google";
+
+/* ボタン表示状態 */
+document.querySelectorAll("#engineSwitch button").forEach(btn=>{
+  if(btn.dataset.engine===engine) btn.classList.add("active");
+
+  btn.onclick=()=>{
+    engine=btn.dataset.engine;
+    localStorage.setItem("searchEngine",engine);
+
+    document.querySelectorAll("#engineSwitch button")
+      .forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  };
+});
+
+/* 検索URL生成 */
+function buildSearch(q){
+  if(engine==="bing") return "https://www.bing.com/search?q="+q;
+  if(engine==="duck") return "https://duckduckgo.com/?q="+q;
+  return "https://www.google.com/search?q="+q;
+}
+
+/* Enter検索 */
+document.getElementById("search").addEventListener("keydown",function(e){
+  if(e.key!=="Enter") return;
+
+  let v=e.target.value.trim();
+  if(!v) return;
+
+  if(!v.startsWith("http"))
+    v=buildSearch(encodeURIComponent(v));
+
+  location.href=v;
+});
+
+(function(){
+  function updateClock(){
+    const now=new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    const s=String(now.getSeconds()).padStart(2,'0');
+    document.getElementById("clock").textContent=h+":"+m+":"+s;
+    document.getElementById("date").textContent=
+      now.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"});
+  }
+  updateClock();
+  setInterval(updateClock,1000);
+})();
+</script>
+</body>
+</html>
